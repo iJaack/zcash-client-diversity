@@ -12,7 +12,8 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "types": ["node", "vite/client"],
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "rewriteRelativeImportExtensions": true
   },
   "include": ["src", "server", "tests", "vite.config.ts", "api"]
 }
