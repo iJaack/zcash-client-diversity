@@ -1,22 +1,44 @@
-import type { Census } from "../lib/census.ts";
+import type { Census, ClientRow, VersionRow } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
+import { sortClientRows, type DashboardView } from "../lib/dashboardView.ts";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 export default function ClientTable({
   census,
   filter,
   setFilter,
   versions,
+  sort,
+  order,
+  onSort,
 }: {
   census: Census | null;
   filter: string;
   setFilter: (value: string) => void;
   versions: boolean;
+  sort: DashboardView["sort"];
+  order: DashboardView["order"];
+  onSort: (column: DashboardView["sort"]) => void;
 }) {
   const clients = census?.clients ?? [];
-  const rows = versions
+  const filtered: (ClientRow | VersionRow)[] = versions
     ? (census?.versions.filter(
         (row) => filter === "all" || row.client === filter,
       ) ?? [])
     : clients.filter((row) => filter === "all" || row.name === filter);
+  const rows = sortClientRows(
+    filtered,
+    (row) => ("name" in row ? row.name : `${row.client}/${row.version}`),
+    sort,
+    order,
+  );
+  const sortIcon = (column: DashboardView["sort"]) =>
+    sort !== column ? (
+      <ArrowUpDown size={13} />
+    ) : order === "asc" ? (
+      <ArrowUp size={13} />
+    ) : (
+      <ArrowDown size={13} />
+    );
   return (
     <section className="breakdown" aria-labelledby="breakdown-title">
       <div className="section-heading">
@@ -32,6 +54,11 @@ export default function ClientTable({
           onChange={(event) => setFilter(event.target.value)}
         >
           <option value="all">All clients</option>
+          {filter !== "all" && !clients.some((row) => row.name === filter) && (
+            <option value={filter}>
+              {filter} ({census ? "not in latest sample" : "no current sample"})
+            </option>
+          )}
           {clients.map((row) => (
             <option key={row.name}>{row.name}</option>
           ))}
@@ -41,8 +68,36 @@ export default function ClientTable({
         <table>
           <thead>
             <tr>
-              <th>Client{versions ? " / version" : ""}</th>
-              <th className="numeric">Nodes</th>
+              <th
+                aria-sort={
+                  sort === "client"
+                    ? order === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
+              >
+                <button
+                  className="sort-button"
+                  onClick={() => onSort("client")}
+                >
+                  Client{versions ? " / version" : ""} {sortIcon("client")}
+                </button>
+              </th>
+              <th
+                className="numeric"
+                aria-sort={
+                  sort === "nodes"
+                    ? order === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                }
+              >
+                <button className="sort-button" onClick={() => onSort("nodes")}>
+                  Nodes {sortIcon("nodes")}
+                </button>
+              </th>
               <th className="numeric">Share</th>
             </tr>
           </thead>

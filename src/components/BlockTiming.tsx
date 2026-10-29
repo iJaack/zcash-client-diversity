@@ -1,4 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
+import { useId } from "react";
+import type { DashboardView } from "../lib/dashboardView.ts";
 import type { BlockTiming as Timing } from "../lib/blockTiming.ts";
 import type { Resource } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
@@ -7,6 +9,30 @@ const seconds = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
+const intervalMetrics = {
+  mean: {
+    label: "Average",
+    heading: "Average interval",
+    field: "meanSeconds",
+    explanation:
+      "Average of the available intervals for each tag. Unusually long intervals can pull it upward.",
+  },
+  median: {
+    label: "Median",
+    heading: "Median interval",
+    field: "medianSeconds",
+    explanation:
+      "The middle interval for each tag. Less affected by unusually long intervals.",
+  },
+  p90: {
+    label: "P90",
+    heading: "90th percentile",
+    field: "p90Seconds",
+    explanation:
+      "Highlights longer intervals: about nine in ten timed intervals are at or below this value.",
+  },
+} as const;
+const metricKeys = ["mean", "median", "p90"] as const;
 function duration(value: number | null) {
   return value === null ? "—" : `${seconds.format(value)} s`;
 }
@@ -22,11 +48,17 @@ export default function BlockTiming({
   resource,
   busy,
   error,
+  metric,
+  onMetricChange,
 }: {
   resource: Resource<Timing> | null;
   busy: boolean;
   error: string | null;
+  metric: DashboardView["metric"];
+  onMetricChange: (metric: DashboardView["metric"]) => void;
 }) {
+  const selectedMetric = intervalMetrics[metric];
+  const comparisonId = useId();
   const data = resource?.data ?? null;
   const issue = error ?? resource?.error;
   const rows =
@@ -84,71 +116,104 @@ export default function BlockTiming({
           </p>
           <p>From one network block to the next.</p>
         </div>
-        <div className="timing-client-table table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Client tag</th>
-                <th scope="col" className="numeric">
-                  Average interval
-                </th>
-                <th scope="col" className="numeric">
-                  Timed blocks
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data
-                ? rows.map((row) => (
-                    <tr key={row.key}>
-                      <th scope="row">
-                        <span className="client-name">
-                          <i
-                            className="dot"
-                            style={{ backgroundColor: clientColor(row.name) }}
-                          />
-                          {row.name}
-                        </span>
-                        {row.blocks === 0 && (
-                          <span className="version-label">
-                            No tagged blocks
+        <div className="timing-comparison">
+          <div className="timing-controls">
+            <span id={`${comparisonId}-label`}>Client statistic</span>
+            <div
+              className="segmented small"
+              role="group"
+              aria-labelledby={`${comparisonId}-label`}
+            >
+              {metricKeys.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={metric === key}
+                  aria-controls={`${comparisonId}-table`}
+                  onClick={() => onMetricChange(key)}
+                >
+                  {intervalMetrics[key].label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p
+            className="timing-metric-note"
+            id={`${comparisonId}-description`}
+            aria-live="polite"
+          >
+            {selectedMetric.explanation} Timed block counts show each sample’s
+            size.
+          </p>
+          <div className="timing-client-table table-wrap">
+            <table
+              id={`${comparisonId}-table`}
+              aria-describedby={`${comparisonId}-description`}
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Client tag</th>
+                  <th scope="col" className="numeric">
+                    {selectedMetric.heading}
+                  </th>
+                  <th scope="col" className="numeric">
+                    Timed blocks
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data
+                  ? rows.map((row) => (
+                      <tr key={row.key}>
+                        <th scope="row">
+                          <span className="client-name">
+                            <i
+                              className="dot"
+                              style={{ backgroundColor: clientColor(row.name) }}
+                            />
+                            {row.name}
                           </span>
-                        )}
-                      </th>
-                      <td className="timing-interval numeric">
-                        <strong>{duration(row.meanSeconds)}</strong>
-                      </td>
-                      <td className="numeric">
-                        {row.timedBlocks.toLocaleString()}
-                        <span className="timing-denominator">
-                          {" "}
-                          / {row.blocks.toLocaleString()}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                : ["Zebra", "Zakura", "zcashd"].map((name) => (
-                    <tr key={name}>
-                      <th scope="row">
-                        <span className="client-name">
-                          <i
-                            className="dot"
-                            style={{ backgroundColor: clientColor(name) }}
-                          />
-                          {name}
-                        </span>
-                      </th>
-                      <td className="timing-interval numeric">—</td>
-                      <td className="numeric">—</td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
-          {busy && !data && (
-            <p className="empty-copy" role="status">
-              Loading block-header observations…
-            </p>
-          )}
+                          {row.blocks === 0 && (
+                            <span className="version-label">
+                              No tagged blocks
+                            </span>
+                          )}
+                        </th>
+                        <td className="timing-interval numeric">
+                          <strong>{duration(row[selectedMetric.field])}</strong>
+                        </td>
+                        <td className="numeric">
+                          {row.timedBlocks.toLocaleString()}
+                          <span className="timing-denominator">
+                            {" "}
+                            / {row.blocks.toLocaleString()}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  : ["Zebra", "Zakura", "zcashd"].map((name) => (
+                      <tr key={name}>
+                        <th scope="row">
+                          <span className="client-name">
+                            <i
+                              className="dot"
+                              style={{ backgroundColor: clientColor(name) }}
+                            />
+                            {name}
+                          </span>
+                        </th>
+                        <td className="timing-interval numeric">—</td>
+                        <td className="numeric">—</td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
+            {busy && !data && (
+              <p className="empty-copy" role="status">
+                Loading block-header observations…
+              </p>
+            )}
+          </div>
         </div>
       </div>
       <p className="timing-explainer">

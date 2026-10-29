@@ -25,6 +25,14 @@ Body contrast is 16.74:1 against the canvas; secondary text is 8.13:1 on panels.
 
 The original light concept below records the initial direction. The current palette and geometry above supersede its surface styling.
 
+## Exploration behavior
+
+Client chips, proportional bar segments and chart legend buttons focus the node history and breakdown together. The full sample denominator and original bar widths remain fixed; selection highlights rather than renormalizes the chart. A visible focus summary and Show all clients control explain and clear the selection. Breakdown column buttons sort by client/version name or numeric node count, and export follows the same ordering.
+
+The history inspector uses original observations, including points omitted from sampled lines. Pointer hover, touch taps, a native keyboard slider and Previous/Next/Latest buttons expose timestamp, total, counts and shares. Gaps snap to a labelled recorded sample, never interpolated data. Duplicate timestamps retain separate occurrence identities so keyboard navigation can reach every record; refresh reanchors the selected occurrence where possible. Mobile keeps native horizontal scrolling without drag capture or scroll interception.
+
+Average/Median/P90 switches only the per-tag interval statistic, with a short definition and sample counts; the overview remains the sample average and software-speed caveat stays visible. Share view captures client, date range, grouping, sort and statistic in the URL; Back/Forward restores the same controls. Hover/scrubber selection is temporary. Copy feedback follows the actual clipboard result, ignores stale completions after a view change and offers a selectable link when clipboard access fails. No persistence, background polling or charting dependency is added.
+
 ## Historical initial concept
 
 Visual target: `dashboard-concept.png`, a single desktop dashboard around 1440 × 1100. Design goal: let researchers understand the client mix among publicly reachable Zcash nodes, inspect provenance, and explore snapshots without implying a census of the whole network.

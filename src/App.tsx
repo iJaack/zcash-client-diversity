@@ -5,7 +5,9 @@ import {
   CircleAlert,
   Clock3,
   Download,
+  Link2,
   RefreshCw,
+  X,
 } from "lucide-react";
 import { useDashboard } from "./lib/useDashboard.ts";
 import { csvForCensus } from "./lib/census.ts";
@@ -15,7 +17,16 @@ import { useBlockTiming } from "./lib/useBlockTiming.ts";
 import ClientTable from "./components/ClientTable.tsx";
 import HistoryChart from "./components/HistoryChart.tsx";
 import Methodology from "./components/Methodology.tsx";
+import { useDashboardView } from "./lib/useDashboardView.ts";
+import {
+  dashboardViewSearch,
+  parseDashboardView,
+  sortClientRows,
+} from "./lib/dashboardView.ts";
 const repository = "https://github.com/iJaack/zcash-client-diversity";
+function currentViewUrl() {
+  return `${window.location.origin}${window.location.pathname}${dashboardViewSearch(parseDashboardView(window.location.search))}`;
+}
 function formatTime(value: string) {
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
@@ -31,13 +42,34 @@ function App() {
     const tick = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(tick);
   }, []);
-  const [period, setPeriod] = useState<"7d" | "30d">("7d");
-  const [view, setView] = useState<"distribution" | "versions">("distribution");
-  const [filter, setFilter] = useState("all");
+  const [dashboardView, updateView] = useDashboardView();
+  const { period, view, client: filter, sort, order, metric } = dashboardView;
+  const [sharing, setSharing] = useState<"idle" | "copied" | "manual">("idle");
+  const shareUrl = currentViewUrl();
+  useEffect(() => setSharing("idle"), [dashboardView]);
+  useEffect(() => {
+    if (sharing !== "copied") return;
+    const timer = setTimeout(() => setSharing("idle"), 3000);
+    return () => clearTimeout(timer);
+  }, [sharing]);
+  const focusClient = (client: string) =>
+    updateView({ client: filter === client ? "all" : client });
+  const shareView = async () => {
+    const requestedUrl = currentViewUrl();
+    let result: "copied" | "manual";
+    try {
+      await navigator.clipboard.writeText(requestedUrl);
+      result = "copied";
+    } catch {
+      result = "manual";
+    }
+    if (currentViewUrl() === requestedUrl) setSharing(result);
+  };
   const { payload, busy, error, refresh } = useDashboard(period);
   const timing = useBlockTiming();
   const refreshing = busy || timing.busy;
   const census = payload?.current.data ?? null;
+  const focused = census?.clients.find((row) => row.name === filter);
   const history = payload?.history.data ?? [];
   const currentError = error ?? payload?.current.error;
   const old = census
@@ -61,14 +93,24 @@ function App() {
           ...census,
           clients:
             view === "distribution"
-              ? census.clients.filter(
-                  (row) => filter === "all" || row.name === filter,
+              ? sortClientRows(
+                  census.clients.filter(
+                    (row) => filter === "all" || row.name === filter,
+                  ),
+                  (row) => row.name,
+                  sort,
+                  order,
                 )
               : [],
           versions:
             view === "versions"
-              ? census.versions.filter(
-                  (row) => filter === "all" || row.client === filter,
+              ? sortClientRows(
+                  census.versions.filter(
+                    (row) => filter === "all" || row.client === filter,
+                  ),
+                  (row) => `${row.client}/${row.version}`,
+                  sort,
+                  order,
                 )
               : [],
         }),
@@ -123,6 +165,13 @@ function App() {
               Export CSV
             </button>
             <button
+              className="button secondary"
+              onClick={() => void shareView()}
+            >
+              {sharing === "copied" ? <Check size={15} /> : <Link2 size={15} />}
+              {sharing === "copied" ? "Link copied" : "Share view"}
+            </button>
+            <button
               className="button primary"
               onClick={() => {
                 void Promise.allSettled([refresh(), timing.refresh()]);
@@ -134,6 +183,19 @@ function App() {
             </button>
           </div>
         </div>
+        {sharing === "manual" && (
+          <label className="share-fallback">
+            Copy this view link
+            <input
+              readOnly
+              value={shareUrl}
+              onFocus={(event) => event.currentTarget.select()}
+            />
+          </label>
+        )}
+        <span className="sr-only" role="status">
+          {sharing === "copied" ? "View link copied to clipboard." : ""}
+        </span>
         <div
           className={`source-banner ${stale ? "warning" : ""}`}
           role="status"
@@ -185,13 +247,13 @@ function App() {
             <div className="segmented" aria-label="Table grouping">
               <button
                 aria-pressed={view === "distribution"}
-                onClick={() => setView("distribution")}
+                onClick={() => updateView({ view: "distribution" })}
               >
                 Distribution
               </button>
               <button
                 aria-pressed={view === "versions"}
-                onClick={() => setView("versions")}
+                onClick={() => updateView({ view: "versions" })}
               >
                 Versions
               </button>
@@ -219,7 +281,7 @@ function App() {
           </div>
           <div
             className={`share-bar ${!census?.total ? "empty" : ""}`}
-            role="img"
+            role="group"
             aria-label={
               census
                 ? census.clients
@@ -234,8 +296,12 @@ function App() {
             {census?.clients
               .filter((row) => row.count > 0)
               .map((row) => (
-                <div
+                <button
+                  type="button"
                   key={row.name}
+                  aria-label={`Focus on ${row.name}: ${row.count} IPs, ${row.share.toFixed(1)} percent`}
+                  aria-pressed={filter === row.name}
+                  onClick={() => focusClient(row.name)}
                   style={{
                     width: `${row.share}%`,
                     background: clientColor(row.name),
@@ -243,10 +309,20 @@ function App() {
                   title={`${row.name}: ${row.share.toFixed(1)}%`}
                 >
                   {row.share > 8 && <span>{row.share.toFixed(1)}%</span>}
-                </div>
+                </button>
               ))}
           </div>
-          <div className="distribution-legend">
+          <div
+            className="distribution-legend"
+            aria-label="Focus node views on a client"
+          >
+            <button
+              className="distribution-key all-clients"
+              aria-pressed={filter === "all"}
+              onClick={() => updateView({ client: "all" })}
+            >
+              All clients
+            </button>
             {(
               census?.clients ??
               ["Zebra", "Zakura", "zcashd", "Unknown"].map((name) => ({
@@ -255,7 +331,13 @@ function App() {
                 share: null,
               }))
             ).map((row) => (
-              <div key={row.name} className="distribution-key">
+              <button
+                key={row.name}
+                className="distribution-key"
+                aria-pressed={filter === row.name}
+                onClick={() => focusClient(row.name)}
+                disabled={!census}
+              >
                 <i
                   className="dot"
                   style={{ backgroundColor: clientColor(row.name) }}
@@ -266,8 +348,40 @@ function App() {
                   {row.share !== null && "%"}
                 </strong>
                 <small>{row.count?.toLocaleString() ?? "—"}</small>
-              </div>
+              </button>
             ))}
+          </div>
+          <div className="focus-summary" role="status">
+            <p>
+              {filter === "all" ? (
+                "Select a client to focus the history chart and breakdown."
+              ) : !census ? (
+                <>
+                  <strong>{filter}</strong> is selected. No current node sample
+                  is available yet.
+                </>
+              ) : focused ? (
+                <>
+                  <strong>{focused.name}</strong> ·{" "}
+                  {focused.count.toLocaleString()} observed IPs ·{" "}
+                  {focused.share.toFixed(1)}% of the full sample. History and
+                  breakdown focused.
+                </>
+              ) : (
+                <>
+                  <strong>{filter}</strong> is absent from the latest sample.
+                  History and breakdown remain focused on this client.
+                </>
+              )}
+            </p>
+            {filter !== "all" && (
+              <button
+                className="clear-focus"
+                onClick={() => updateView({ client: "all" })}
+              >
+                <X size={13} /> Show all clients
+              </button>
+            )}
           </div>
           <p className="distribution-note">
             Advertised client mix, not independent codebase diversity. Zakura
@@ -278,6 +392,8 @@ function App() {
           resource={timing.resource}
           busy={timing.busy}
           error={timing.error}
+          metric={metric}
+          onMetricChange={(metric) => updateView({ metric })}
         />
         <div className="analytics-grid">
           <section className="history" aria-labelledby="history-title">
@@ -291,7 +407,7 @@ function App() {
                   <button
                     key={value}
                     aria-pressed={period === value}
-                    onClick={() => setPeriod(value)}
+                    onClick={() => updateView({ period: value })}
                   >
                     {value === "7d" ? "7 days" : "30 days"}
                   </button>
@@ -311,7 +427,11 @@ function App() {
                 Loading source observations…
               </div>
             ) : (
-              <HistoryChart points={history} />
+              <HistoryChart
+                points={history}
+                focusedClient={filter}
+                onFocusClient={focusClient}
+              />
             )}
             {history.length > 0 && (
               <p className="fine-print">
@@ -326,7 +446,22 @@ function App() {
             census={census}
             versions={view === "versions"}
             filter={filter}
-            setFilter={setFilter}
+            setFilter={(client) => updateView({ client })}
+            sort={sort}
+            order={order}
+            onSort={(column) =>
+              updateView({
+                sort: column,
+                order:
+                  sort === column
+                    ? order === "asc"
+                      ? "desc"
+                      : "asc"
+                    : column === "client"
+                      ? "asc"
+                      : "desc",
+              })
+            }
           />
         </div>
         <Methodology census={census} />

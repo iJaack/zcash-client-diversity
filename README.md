@@ -4,6 +4,8 @@
 
 A source-backed dashboard for the advertised clients observed on Zcash mainnet. It shows current client shares, compatible historical shares, and the source’s top reported versions, with CSV export and explicit data coverage.
 
+Select a client from the distribution or chart legend to focus the history and table. Hover or tap the timeline to inspect a recorded sample, or use the keyboard slider and Previous/Next controls. Table headers sort clients and node counts; CSV follows the displayed grouping, filter and order. **Share view** copies the client focus, range, grouping, sort and timing statistic into a link that also works with browser Back/Forward. Timeline inspection is temporary and does not change the shared link or trigger network requests.
+
 ![Dashboard preview](design/dashboard-preview.png)
 
 ## Run locally
@@ -52,6 +54,6 @@ Production domain: https://zeclens.dev. The www hostname redirects to the apex; 
 
 ## Block timing
 
-The highlighted timing view groups observed block-header intervals by the self-reported client tag on each winning block. It uses the previous UTC-day window for every client and reports the average plus timed/returned sample counts; median and 90th-percentile intervals are available in the explanation. These observations depend on mining power, difficulty, chance and header timestamps. They are not controlled measurements of client processing or block-template generation speed.
+The highlighted timing view groups observed block-header intervals by the self-reported client tag on each winning block. It uses the previous UTC-day window for every client and lets you switch between average, median and 90th-percentile intervals, with timed/returned sample counts. The network sample average stays visible for context. These observations depend on mining power, difficulty, chance and header timestamps. They are not controlled measurements of client processing or block-template generation speed.
 
 `/api/block-timing` reads every matching indexed block through fixed ZecBlock cursor URLs, rechecks its first-page anchor, and discards incomplete or inconsistent captures. It has a 15-second total deadline, a five-minute per-instance cache and bounded CDN caching that expires by UTC midnight. Coverage can be partial if the upstream index is behind. The route creates no scheduled work. See [timing sources and methodology](docs/PERFORMANCE-SOURCES.md).
