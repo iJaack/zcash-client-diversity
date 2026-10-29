@@ -2,6 +2,8 @@
 
 A source-backed dashboard for the advertised clients observed on Zcash mainnet. It shows current client shares, compatible historical shares, and the source’s top reported versions, with CSV export and explicit data coverage.
 
+![Dashboard preview](design/dashboard-preview.png)
+
 ## Run locally
 
 Requires **Node.js 24 or newer**.

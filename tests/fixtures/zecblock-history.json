@@ -1,0 +1,84 @@
+{
+  "data": {
+    "period": "30d",
+    "snapshots": [
+      {
+        "time": "2026-10-19T11:30:02.935Z",
+        "activeNodes": 445,
+        "torNodes": null,
+        "torClassificationAvailable": false,
+        "torClassificationCheckedAt": null,
+        "countries": 41,
+        "inboundNodes": 300,
+        "outboundNodes": 145,
+        "avgPingMs": 965.643,
+        "identifiedClientNodes": 445,
+        "clientCounts": {
+          "Zebra": 301,
+          "Seeder": 3,
+          "Zakura": 141
+        }
+      },
+      {
+        "time": "2026-10-24T14:50:01.714Z",
+        "activeNodes": 462,
+        "torNodes": null,
+        "torClassificationAvailable": false,
+        "torClassificationCheckedAt": null,
+        "countries": 42,
+        "inboundNodes": 301,
+        "outboundNodes": 150,
+        "avgPingMs": 1283.51,
+        "identifiedClientNodes": 462,
+        "clientCounts": {
+          "Zebra": 313,
+          "Seeder": 4,
+          "Zakura": 145
+        }
+      },
+      {
+        "time": "2026-10-29T18:10:01.392Z",
+        "activeNodes": 467,
+        "torNodes": 3,
+        "torClassificationAvailable": true,
+        "torClassificationCheckedAt": "2026-10-29T18:10:01.383Z",
+        "countries": 45,
+        "inboundNodes": 301,
+        "outboundNodes": 150,
+        "avgPingMs": 1517.46,
+        "identifiedClientNodes": 465,
+        "clientCounts": {
+          "Zebra": 317,
+          "Seeder": 2,
+          "Zakura": 146,
+          "Unknown": 2
+        }
+      }
+    ],
+    "timestamp": 1793297474740
+  },
+  "meta": {
+    "requestId": "b58c5018-9952-4a35-bc14-ee17ea0b9771",
+    "network": "mainnet",
+    "generatedAt": "2026-10-29T18:11:14.749Z",
+    "indexedHeight": 3534970,
+    "source": {
+      "indexedHeight": null,
+      "observedAt": null
+    },
+    "cache": {
+      "status": "unknown",
+      "ageSeconds": null
+    },
+    "freshness": {
+      "status": "unknown",
+      "ageSeconds": null
+    },
+    "units": {
+      "authoritativeMonetary": "zatoshi",
+      "authoritativeEncoding": "decimal-string",
+      "zatoshiPerZec": "100000000",
+      "legacyFormattedFields": "field-defined"
+    }
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "data": {
+    "stats": {
+      "activeNodes": 467,
+      "totalNodes": 4693,
+      "countries": 45,
+      "cities": 154,
+      "avgPingMs": 1517.5,
+      "torNodes": 3,
+      "lastUpdated": "2026-10-29T18:10:01.111Z",
+      "censusVersion": 3,
+      "observationWindowSeconds": 3600,
+      "peerObservationWindowSeconds": 900,
+      "scope": "live-peers-and-chain-qualified-crawler-unique-ips",
+      "crawlerChainProof": "zcash-mainnet-checkpoint-v1",
+      "chainQualifiedCrawlerNodes": 50,
+      "localPeerNodes": 451,
+      "localPeerOnlyNodes": 417,
+      "overlapNodes": 34,
+      "totalNodesScope": "all-historical-candidate-ips",
+      "topologyAvailable": false,
+      "torClassificationAvailable": true,
+      "torClassificationCheckedAt": "2026-10-29T18:10:01.383Z"
+    },
+    "trends": {
+      "change24h": 0.6,
+      "change7d": 16.2,
+      "change30d": null
+    },
+    "topCountries": [
+      {
+        "country": "United States",
+        "countryCode": "US",
+        "nodeCount": 158
+      },
+      {
+        "country": "Germany",
+        "countryCode": "DE",
+        "nodeCount": 62
+      },
+      {
+        "country": "France",
+        "countryCode": "FR",
+        "nodeCount": 40
+      },
+      {
+        "country": "Finland",
+        "countryCode": "FI",
+        "nodeCount": 26
+      },
+      {
+        "country": "The Netherlands",
+        "countryCode": "NL",
+        "nodeCount": 22
+      },
+      {
+        "country": "Canada",
+        "countryCode": "CA",
+        "nodeCount": 17
+      },
+      {
+        "country": "Hong Kong",
+        "countryCode": "HK",
+        "nodeCount": 17
+      },
+      {
+        "country": "Singapore",
+        "countryCode": "SG",
+        "nodeCount": 15
+      },
+      {
+        "country": "Japan",
+        "countryCode": "JP",
+        "nodeCount": 14
+      },
+      {
+        "country": "United Kingdom",
+        "countryCode": "GB",
+        "nodeCount": 12
+      }
+    ],
+    "clients": {
+      "observedNodes": 467,
+      "identifiedNodes": 465,
+      "coveragePercentage": 99.6,
+      "distribution": [
+        {
+          "client": "Zebra",
+          "count": 317
+        },
+        {
+          "client": "Zakura",
+          "count": 146
+        },
+        {
+          "client": "Seeder",
+          "count": 2
+        },
+        {
+          "client": "Unknown",
+          "count": 2
+        }
+      ],
+      "versions": [
+        {
+          "client": "Zebra",
+          "version": "7.0.0",
+          "count": 126
+        },
+        {
+          "client": "Zakura",
+          "version": "1.7.0",
+          "count": 94
+        },
+        {
+          "client": "Zebra",
+          "version": "6.3.0",
+          "count": 69
+        },
+        {
+          "client": "Zebra",
+          "version": "6.4.2",
+          "count": 68
+        },
+        {
+          "client": "Zakura",
+          "version": "1.6.0",
+          "count": 20
+        },
+        {
+          "client": "Zebra",
+          "version": "6.2.3",
+          "count": 16
+        },
+        {
+          "client": "Zakura",
+          "version": "1.7.0-rc1",
+          "count": 14
+        },
+        {
+          "client": "Zakura",
+          "version": "1.7.0-modified",
+          "count": 11
+        },
+        {
+          "client": "Zebra",
+          "version": "6.2.0",
+          "count": 10
+        },
+        {
+          "client": "Zebra",
+          "version": "7.0.0-rc.0",
+          "count": 8
+        },
+        {
+          "client": "Zebra",
+          "version": "7.0.0-modified",
+          "count": 8
+        },
+        {
+          "client": "Zakura",
+          "version": "1.7.0-rc2",
+          "count": 4
+        }
+      ]
+    },
+    "timestamp": 1793297425292
+  },
+  "meta": {
+    "requestId": "61524c69-e6f2-48ae-a503-5b30f906e765",
+    "network": "mainnet",
+    "generatedAt": "2026-10-29T18:11:14.713Z",
+    "indexedHeight": 3534970,
+    "source": {
+      "indexedHeight": null,
+      "observedAt": null
+    },
+    "cache": {
+      "status": "unknown",
+      "ageSeconds": null
+    },
+    "freshness": {
+      "status": "unknown",
+      "ageSeconds": null
+    },
+    "units": {
+      "authoritativeMonetary": "zatoshi",
+      "authoritativeEncoding": "decimal-string",
+      "zatoshiPerZec": "100000000",
+      "legacyFormattedFields": "field-defined"
+    }
+  }
+}
