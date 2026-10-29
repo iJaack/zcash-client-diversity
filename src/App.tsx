@@ -87,7 +87,7 @@ function App() {
         <div className="header-inner">
           <a className="brand" href="#overview">
             <img src="/favicon.svg" alt="" width="38" height="38" />
-            <span>Zcash observatory</span>
+            <span>ZecLens</span>
           </a>
           <nav aria-label="Main navigation">
             <a href="#overview" className="active">
@@ -322,7 +322,7 @@ function App() {
       </main>
       <footer className="site-footer">
         <div>
-          <span>Zcash observatory</span>
+          <span>ZecLens</span>
           <span>
             Independent view · Data by{" "}
             <a

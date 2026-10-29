@@ -40,3 +40,7 @@ The implemented visual system was faithfully verified against the reference with
 ## Limits
 
 This is a local application and repository delivery, not a deployed website. ZecBlock is one observation source. Client labels are self-reported and are not proof of independent codebases, operators, honest validation, or mining share. Public upstream access and rate policy can change; errors and last-good states remain explicit.
+
+## ZecLens publishing update
+
+The public product name is now **ZecLens**; “Zcash client diversity” remains the page title and analytical purpose. Added a Vercel Web handler that reuses the tested service, keeps query destinations fixed, and only shares successful public aggregates through a bounded CDN cache. All **32 named tests** and the production build pass, including three hosted-handler boundary/cache checks. Runtime caches are best effort per function instance and do not persist across cold starts. Public deployment verification is recorded after release.
