@@ -1,5 +1,7 @@
 # ZecLens — Zcash client diversity
 
+**Live:** [zeclens.dev](https://zeclens.dev)
+
 A source-backed dashboard for the advertised clients observed on Zcash mainnet. It shows current client shares, compatible historical shares, and the source’s top reported versions, with CSV export and explicit data coverage.
 
 ![Dashboard preview](design/dashboard-preview.png)
@@ -46,4 +48,4 @@ See [API research and provenance](docs/API-SOURCES.md) for verified endpoints, s
 - `tests/`: data integrity, chart gaps, CSV, caching, and server boundaries
 - `design/`: visual reference and implementation tokens
 
-Vercel deployment target: https://zeclens.vercel.app. The repository includes a Vercel Web handler in `api/dashboard.ts`, which reuses the local server’s data validation. Successful public API responses have a 60-second Vercel CDN cache with a 120-second stale-while-revalidate window. In-process last-good data and request coalescing are best effort per function instance; a cold start can have no cached data. No analytics, wallet connection, account system, or secret is required.
+Production domain: https://zeclens.dev. The www hostname redirects to the apex; https://zeclens.vercel.app remains available as a hosting fallback. The repository includes a Vercel Web handler in `api/dashboard.ts`, which reuses the local server’s data validation. Successful public API responses have a 60-second Vercel CDN cache with a 120-second stale-while-revalidate window. In-process last-good data and request coalescing are best effort per function instance; a cold start can have no cached data. No analytics, wallet connection, account system, or secret is required.

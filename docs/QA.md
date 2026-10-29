@@ -46,3 +46,8 @@ This is a local application and repository delivery, not a deployed website. Zec
 The public product name is now **ZecLens**; “Zcash client diversity” remains the page title and analytical purpose. Added a Vercel Web handler that reuses the tested service, keeps query destinations fixed, and only shares successful public aggregates through a bounded CDN cache. All **32 named tests** and the production build pass, including three hosted-handler boundary/cache checks. Runtime caches are best effort per function instance and do not persist across cold starts. Public deployment verification is recorded after release.
 
 The first Vercel runtime check caught `.ts` import paths surviving compilation into JavaScript. A new compiled-entrypoint regression reproduces the missing-module failure without TypeScript source files, then verifies the emitted route loads and enforces query validation. Enabling TypeScript’s relative import-extension rewrite resolves the reproduced failure. All **33 tests** and the production build pass.
+
+
+## Custom domain verification
+
+Connected **zeclens.dev** and its www redirect after GoDaddy DNS changes. Vercel reports both names correctly configured with no DNS conflicts. HTTPS certificate covers both names and has automatic renewal enabled. Anonymous HTTPS checks returned 200 for the apex and the live API, and www returned 308 to https://zeclens.dev/. Browser checks on the custom domain verified live data, both history ranges, client/version filtering, CSV download and mobile layout without page errors. The managed browser proxy CA is not trusted directly by Chromium, so production browser resource reads used Node’s TLS-verified fetch through the inherited proxy; TLS verification was kept enabled.
