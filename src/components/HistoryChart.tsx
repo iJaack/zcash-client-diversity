@@ -329,11 +329,7 @@ export function HistoryChart({
             key={series.name}
             aria-pressed={focusedClient === series.name}
             disabled={!onFocusClient}
-            onClick={() =>
-              onFocusClient?.(
-                focusedClient === series.name ? "all" : series.name,
-              )
-            }
+            onClick={() => onFocusClient?.(series.name)}
             aria-label={`Focus node views on ${series.name}`}
           >
             <svg
@@ -498,9 +494,11 @@ export function HistoryChart({
               </tr>
             </thead>
             <tbody>
-              {recent.flatMap((point) =>
+              {recent.flatMap((point, pointIndex) =>
                 point.clients.map((client) => (
-                  <tr key={`${point.at}-${point.censusVersion}-${client.name}`}>
+                  <tr
+                    key={`${point.at}-${point.censusVersion}-${pointIndex}-${client.name}`}
+                  >
                     <td>
                       <time dateTime={point.at}>
                         {timestampFormat.format(Date.parse(point.at))}

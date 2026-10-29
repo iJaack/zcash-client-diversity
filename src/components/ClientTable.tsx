@@ -1,9 +1,10 @@
 import type { Census, ClientRow, VersionRow } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
-import { sortClientRows, type DashboardView } from "../lib/dashboardView.ts";
+import type { DashboardView } from "../lib/dashboardView.ts";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 export default function ClientTable({
   census,
+  rows,
   filter,
   setFilter,
   versions,
@@ -12,6 +13,7 @@ export default function ClientTable({
   onSort,
 }: {
   census: Census | null;
+  rows: readonly (ClientRow | VersionRow)[];
   filter: string;
   setFilter: (value: string) => void;
   versions: boolean;
@@ -20,17 +22,6 @@ export default function ClientTable({
   onSort: (column: DashboardView["sort"]) => void;
 }) {
   const clients = census?.clients ?? [];
-  const filtered: (ClientRow | VersionRow)[] = versions
-    ? (census?.versions.filter(
-        (row) => filter === "all" || row.client === filter,
-      ) ?? [])
-    : clients.filter((row) => filter === "all" || row.name === filter);
-  const rows = sortClientRows(
-    filtered,
-    (row) => ("name" in row ? row.name : `${row.client}/${row.version}`),
-    sort,
-    order,
-  );
   const sortIcon = (column: DashboardView["sort"]) =>
     sort !== column ? (
       <ArrowUpDown size={13} />

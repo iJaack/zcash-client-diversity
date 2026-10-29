@@ -223,6 +223,7 @@ h1 {
   gap: 12px;
   flex-shrink: 0;
   padding-top: 10px;
+  flex-wrap: wrap;
 }
 .button {
   border: 1px solid var(--control-rule);
@@ -428,15 +429,22 @@ h2 {
 }
 .distribution-legend {
   display: flex;
-  gap: 16px 30px;
   flex-wrap: wrap;
-  margin: 17px 0 12px;
+  gap: 8px;
+  margin: 17px 0 10px;
 }
 .distribution-key {
   display: flex;
   gap: 9px;
   align-items: center;
   font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--control-rule);
+  padding: 8px 10px;
+  min-height: 44px;
+  text-align: left;
+  max-width: 100%;
 }
 .distribution-key strong {
   font-weight: 600;
@@ -556,9 +564,6 @@ h2 {
 .timing-client-table td.numeric {
   white-space: nowrap;
 }
-.timing-client-table tbody tr:hover {
-  background: var(--surface-hover);
-}
 .timing-interval strong {
   font-size: 22px;
   font-weight: 650;
@@ -593,11 +598,6 @@ h2 {
 .timing-details table {
   font-size: 12px;
   margin-top: 12px;
-}
-.block-timing > .empty-copy {
-  min-height: 180px;
-  display: flex;
-  align-items: center;
 }
 .analytics-grid {
   display: grid;
@@ -636,6 +636,14 @@ h2 {
   align-items: center;
   gap: 7px;
   font-variant-numeric: tabular-nums;
+  border: 1px solid transparent;
+  padding: 5px 7px;
+  min-height: 36px;
+  background: none;
+  color: var(--muted);
+  text-align: left;
+  font-size: inherit;
+  max-width: 100%;
 }
 .legend-item strong {
   font-family: var(--mono);
@@ -839,353 +847,6 @@ tbody tr:hover {
     transform: rotate(360deg);
   }
 }
-@media (min-width: 1441px) {
-  .site-footer {
-    max-width: 1320px;
-  }
-}
-@media (max-width: 1440px) {
-  .site-footer {
-    margin: 0 60px;
-  }
-}
-@media (max-width: 1100px) {
-  .header-inner {
-    padding: 0 32px;
-  }
-  .page {
-    padding: 32px 32px 0;
-  }
-  .page-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .button {
-    padding: 8px 13px;
-    min-height: 38px;
-  }
-  h1 {
-    font-size: 44px;
-  }
-  .lead {
-    font-size: 18px;
-  }
-  .analytics-grid {
-    gap: 26px;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  }
-  .methodology {
-    gap: 32px;
-    grid-template-columns: 1fr 2fr;
-  }
-  .site-footer {
-    margin: 0 32px;
-  }
-  .source-link {
-    display: none;
-  }
-}
-@media (max-width: 760px) {
-  .site-header {
-    height: 68px;
-  }
-  .header-inner {
-    padding: 0 20px;
-  }
-  .brand {
-    font-size: 18px;
-    gap: 10px;
-  }
-  .brand img {
-    width: 32px;
-    height: 32px;
-  }
-  nav {
-    gap: 20px;
-    font-size: 12px;
-  }
-  nav a.active {
-    display: none;
-  }
-  nav a:last-child {
-    font-size: 0;
-    gap: 0;
-  }
-  nav a:last-child svg {
-    width: 19px;
-    height: 19px;
-  }
-  nav .active:after {
-    bottom: 10px;
-  }
-  .page {
-    padding: 28px 20px 0;
-  }
-  .page-heading {
-    display: block;
-    margin-bottom: 20px;
-  }
-  .eyebrow {
-    font-size: 10px;
-    margin-bottom: 10px;
-  }
-  h1 {
-    font-size: 36px;
-    line-height: 1.08;
-  }
-  .lead {
-    font-size: 16px;
-    line-height: 1.5;
-    max-width: 350px;
-    margin-top: 10px;
-  }
-  .page-actions {
-    flex-direction: row;
-    padding-top: 20px;
-  }
-  .button {
-    font-size: 12px;
-    min-height: 40px;
-  }
-  .source-banner {
-    padding: 14px;
-    gap: 12px;
-    align-items: flex-start;
-    margin-bottom: 26px;
-    min-height: 0;
-  }
-  .source-banner strong {
-    font-size: 13px;
-  }
-  .source-banner p {
-    font-size: 11px;
-    line-height: 1.65;
-  }
-  .status-icon {
-    margin-top: 3px;
-  }
-  .status-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-  h2 {
-    font-size: 23px;
-  }
-  .section-heading {
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .distribution > .section-heading {
-    display: block;
-  }
-  .distribution .segmented {
-    margin-top: 14px;
-  }
-  .segmented button {
-    padding: 8px 15px;
-    min-height: 36px;
-  }
-  .section-subtitle {
-    font-size: 12px;
-  }
-  .census-summary {
-    gap: 14px;
-    margin: 19px 0;
-    font-size: 11px;
-    flex-wrap: wrap;
-  }
-  .census-summary > div {
-    gap: 9px;
-  }
-  .total-count {
-    font-size: 36px;
-  }
-  .summary-divider {
-    display: none;
-  }
-  .census-summary > p {
-    margin-left: auto;
-  }
-  .separator {
-    padding: 0 5px;
-  }
-  .share-bar {
-    height: 38px;
-  }
-  .share-bar span {
-    font-size: 12px;
-  }
-  .distribution-legend {
-    gap: 12px 22px;
-    margin-top: 15px;
-  }
-  .distribution-key {
-    font-size: 12px;
-    gap: 7px;
-  }
-  .distribution-key small {
-    font-size: 10px;
-  }
-  .dot {
-    width: 10px;
-    height: 10px;
-  }
-  .distribution-note {
-    font-size: 11px;
-    line-height: 1.6;
-    margin-top: 12px;
-  }
-  .block-timing {
-    padding: 20px 12px;
-    margin-bottom: 28px;
-  }
-  .block-timing > .section-heading {
-    flex-wrap: nowrap;
-    margin-bottom: 20px;
-  }
-  .timing-source {
-    font-size: 11px;
-  }
-  .timing-layout {
-    grid-template-columns: 1fr;
-    gap: 22px;
-  }
-  .timing-overview {
-    border-right: 0;
-    border-bottom: 1px solid var(--rule);
-    padding: 0 0 20px;
-  }
-  .timing-value {
-    font-size: 58px;
-  }
-  .timing-window {
-    margin-top: 9px;
-  }
-  .timing-client-table th,
-  .timing-client-table td {
-    padding: 12px 7px;
-    font-size: 12px;
-  }
-  .timing-client-table th:first-child,
-  .timing-client-table td:first-child {
-    width: 34%;
-  }
-  .timing-client-table th:last-child,
-  .timing-client-table td:last-child {
-    width: 28%;
-  }
-  .timing-client-table thead th {
-    font-size: 11px;
-    vertical-align: bottom;
-    padding-top: 0;
-    line-height: 1.5;
-  }
-  .timing-client-table .client-name {
-    gap: 7px;
-  }
-  .timing-interval strong {
-    font-size: 20px;
-  }
-  .timing-explainer,
-  .timing-details {
-    font-size: 11px;
-  }
-  .analytics-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-  .history,
-  .breakdown {
-    padding-top: 20px;
-  }
-  .history .section-heading {
-    flex-wrap: nowrap;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .history .section-heading h2 {
-    font-size: 23px;
-  }
-  .segmented.small button {
-    padding: 6px 10px;
-  }
-  .chart-legend {
-    gap: 10px 17px;
-    font-size: 11px;
-  }
-  .fine-print {
-    font-size: 10px;
-  }
-  .history-details {
-    font-size: 11px;
-  }
-  th,
-  td {
-    font-size: 13px;
-    padding: 13px 10px;
-  }
-  .methodology {
-    grid-template-columns: 1fr;
-    margin-top: 30px;
-    gap: 26px;
-    padding: 28px 0;
-  }
-  .methodology-intro {
-    max-width: 500px;
-  }
-  .methodology-intro h2 {
-    font-size: 25px;
-  }
-  .methodology-intro > p {
-    font-size: 13px;
-  }
-  .methodology-notes {
-    grid-template-columns: 1fr;
-    gap: 22px;
-  }
-  .methodology-notes p {
-    font-size: 12px;
-  }
-  .site-footer {
-    margin: 0 20px;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .site-footer > div {
-    flex-direction: column;
-    gap: 3px;
-  }
-  .site-footer > a {
-    white-space: nowrap;
-  }
-  .chart-loading,
-  .empty-state {
-    min-height: 230px;
-    font-size: 12px;
-  }
-}
-@media (max-width: 360px) {
-  .timing-client-table th:first-child,
-  .timing-client-table td:first-child,
-  .timing-client-table th:last-child,
-  .timing-client-table td:last-child {
-    width: 32%;
-  }
-  .timing-client-table td:last-child {
-    font-size: 11px;
-  }
-  .timing-interval strong {
-    font-size: 18px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *:before,
-  *:after {
-    animation: none !important;
-    scroll-behavior: auto !important;
-  }
-}
 .history-caption {
   font-size: 11px;
   color: var(--muted);
@@ -1204,21 +865,6 @@ tbody tr:hover {
 .chart-scroll-hint {
   display: none;
 }
-@media (max-width: 760px) {
-  .history-plot-scroll {
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-  }
-  .history-plot-scroll .history-svg {
-    min-width: 760px;
-  }
-  .chart-scroll-hint {
-    display: block;
-    color: var(--muted);
-    font-size: 10px;
-    margin: 7px 0;
-  }
-}
 .history-export {
   padding: 0;
   border: 0;
@@ -1233,8 +879,6 @@ tbody tr:hover {
   gap: 6px;
   min-height: 32px;
 }
-
-/* Exploration controls keep the full sample visible while focusing a client. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1245,9 +889,6 @@ tbody tr:hover {
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
-}
-.page-actions {
-  flex-wrap: wrap;
 }
 .share-fallback {
   display: flex;
@@ -1280,30 +921,17 @@ input:focus-visible {
   outline: 3px solid #09120f;
   outline-offset: -4px;
 }
-.distribution-legend {
-  gap: 8px;
-  margin-bottom: 10px;
-}
-button.distribution-key {
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid var(--control-rule);
-  padding: 8px 10px;
-  min-height: 44px;
-  text-align: left;
-  max-width: 100%;
-}
-button.distribution-key > span,
-button.legend-item > span {
+.distribution-key > span,
+.legend-item > span {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-button.distribution-key:hover,
-button.distribution-key[aria-pressed="true"] {
+.distribution-key:hover,
+.distribution-key[aria-pressed="true"] {
   background: var(--surface-hover);
   border-color: var(--green);
 }
-button.distribution-key[aria-pressed="true"] {
+.distribution-key[aria-pressed="true"] {
   box-shadow: inset 0 -2px var(--green);
 }
 .focus-summary {
@@ -1403,10 +1031,6 @@ button.distribution-key[aria-pressed="true"] {
 .chart-inspector-client strong {
   font-family: var(--mono);
 }
-.chart-inspector-client small {
-  color: var(--muted);
-  font: 11px var(--mono);
-}
 .chart-inspector-client[data-focused="true"] {
   color: var(--green);
 }
@@ -1443,18 +1067,8 @@ button.distribution-key[aria-pressed="true"] {
   color: var(--ink);
   background: var(--surface-hover);
 }
-button.legend-item {
-  border: 1px solid transparent;
-  padding: 5px 7px;
-  min-height: 36px;
-  background: none;
-  color: var(--muted);
-  text-align: left;
-  font-size: inherit;
-  max-width: 100%;
-}
-button.legend-item:hover,
-button.legend-item[aria-pressed="true"] {
+.legend-item:hover,
+.legend-item[aria-pressed="true"] {
   color: var(--ink);
   background: var(--surface-hover);
   border-color: var(--control-rule);
@@ -1462,9 +1076,317 @@ button.legend-item[aria-pressed="true"] {
 .chart-crosshair {
   pointer-events: none;
 }
-@media (max-width: 760px) {
+@media (max-width: 1440px) {
+  .site-footer {
+    margin: 0 60px;
+  }
+}
+@media (max-width: 1100px) {
+  .header-inner {
+    padding: 0 32px;
+  }
+  .page {
+    padding: 32px 32px 0;
+  }
   .page-actions {
+    flex-direction: column;
     gap: 8px;
+  }
+  .button {
+    padding: 8px 13px;
+    min-height: 38px;
+  }
+  h1 {
+    font-size: 44px;
+  }
+  .lead {
+    font-size: 18px;
+  }
+  .analytics-grid {
+    gap: 26px;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+  .methodology {
+    gap: 32px;
+  }
+  .site-footer {
+    margin: 0 32px;
+  }
+  .source-link {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .site-header {
+    height: 68px;
+  }
+  .header-inner {
+    padding: 0 20px;
+  }
+  .brand {
+    font-size: 18px;
+    gap: 10px;
+  }
+  .brand img {
+    width: 32px;
+    height: 32px;
+  }
+  nav {
+    gap: 20px;
+    font-size: 12px;
+  }
+  nav a.active {
+    display: none;
+  }
+  nav a:last-child {
+    font-size: 0;
+    gap: 0;
+  }
+  nav a:last-child svg {
+    width: 19px;
+    height: 19px;
+  }
+  nav .active:after {
+    bottom: 10px;
+  }
+  .page {
+    padding: 28px 20px 0;
+  }
+  .page-heading {
+    display: block;
+    margin-bottom: 20px;
+  }
+  .eyebrow {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 36px;
+  }
+  .lead {
+    font-size: 16px;
+    line-height: 1.5;
+    max-width: 350px;
+    margin-top: 10px;
+  }
+  .page-actions {
+    flex-direction: row;
+    padding-top: 20px;
+  }
+  .button {
+    font-size: 12px;
+    min-height: 40px;
+  }
+  .source-banner {
+    padding: 14px;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 26px;
+    min-height: 0;
+  }
+  .source-banner strong {
+    font-size: 13px;
+  }
+  .source-banner p {
+    font-size: 11px;
+    line-height: 1.65;
+  }
+  .status-icon {
+    margin-top: 3px;
+  }
+  .status-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  h2 {
+    font-size: 23px;
+  }
+  .section-heading {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .distribution > .section-heading {
+    display: block;
+  }
+  .distribution .segmented {
+    margin-top: 14px;
+  }
+  .segmented button {
+    padding: 8px 15px;
+    min-height: 36px;
+  }
+  .section-subtitle {
+    font-size: 12px;
+  }
+  .census-summary {
+    gap: 14px;
+    margin: 19px 0;
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .census-summary > div {
+    gap: 9px;
+  }
+  .total-count {
+    font-size: 36px;
+  }
+  .summary-divider {
+    display: none;
+  }
+  .census-summary > p {
+    margin-left: auto;
+  }
+  .separator {
+    padding: 0 5px;
+  }
+  .share-bar {
+    height: 38px;
+  }
+  .share-bar span {
+    font-size: 12px;
+  }
+  .distribution-legend {
+    gap: 8px;
+    margin-top: 15px;
+  }
+  .distribution-key {
+    font-size: 12px;
+    gap: 7px;
+  }
+  .distribution-key small {
+    font-size: 10px;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+  .distribution-note {
+    font-size: 11px;
+    line-height: 1.6;
+    margin-top: 12px;
+  }
+  .block-timing {
+    padding: 20px 12px;
+    margin-bottom: 28px;
+  }
+  .block-timing > .section-heading {
+    flex-wrap: nowrap;
+    margin-bottom: 20px;
+  }
+  .timing-source {
+    font-size: 11px;
+  }
+  .timing-layout {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .timing-overview {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+    padding: 0 0 20px;
+  }
+  .timing-value {
+    font-size: 58px;
+  }
+  .timing-window {
+    margin-top: 9px;
+  }
+  .timing-client-table th,
+  .timing-client-table td {
+    padding: 12px 7px;
+    font-size: 12px;
+  }
+  .timing-client-table th:first-child,
+  .timing-client-table td:first-child {
+    width: 34%;
+  }
+  .timing-client-table thead th {
+    font-size: 11px;
+    vertical-align: bottom;
+    padding-top: 0;
+    line-height: 1.5;
+  }
+  .timing-client-table .client-name {
+    gap: 7px;
+  }
+  .timing-interval strong {
+    font-size: 20px;
+  }
+  .timing-explainer,
+  .timing-details {
+    font-size: 11px;
+  }
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .history .section-heading {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .segmented.small button {
+    padding: 6px 10px;
+  }
+  .chart-legend {
+    gap: 10px 17px;
+    font-size: 11px;
+  }
+  .fine-print {
+    font-size: 10px;
+  }
+  .history-details {
+    font-size: 11px;
+  }
+  th,
+  td {
+    font-size: 13px;
+    padding: 13px 10px;
+  }
+  .methodology {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+    gap: 26px;
+    padding: 28px 0;
+  }
+  .methodology-intro {
+    max-width: 500px;
+  }
+  .methodology-intro > p {
+    font-size: 13px;
+  }
+  .methodology-notes {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .site-footer {
+    margin: 0 20px;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .site-footer > div {
+    flex-direction: column;
+    gap: 3px;
+  }
+  .site-footer > a {
+    white-space: nowrap;
+  }
+  .chart-loading,
+  .empty-state {
+    min-height: 230px;
+    font-size: 12px;
+  }
+  .history-plot-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .history-plot-scroll .history-svg {
+    min-width: 760px;
+  }
+  .chart-scroll-hint {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    margin: 7px 0;
   }
   .timing-metric-note {
     font-size: 11px;
@@ -1478,9 +1400,31 @@ button.legend-item[aria-pressed="true"] {
   .chart-inspector-heading {
     font-size: 11px;
   }
-  button.legend-item,
+  .legend-item,
   .sort-button,
   .clear-focus {
     min-height: 44px;
+  }
+}
+@media (max-width: 360px) {
+  .timing-client-table th:first-child,
+  .timing-client-table td:first-child,
+  .timing-client-table th:last-child,
+  .timing-client-table td:last-child {
+    width: 32%;
+  }
+  .timing-client-table td:last-child {
+    font-size: 11px;
+  }
+  .timing-interval strong {
+    font-size: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    scroll-behavior: auto !important;
   }
 }

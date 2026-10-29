@@ -1,3 +1,5 @@
+import type { Census } from "./census.ts";
+
 export type DashboardView = {
   period: "7d" | "30d";
   view: "distribution" | "versions";
@@ -46,7 +48,7 @@ export function dashboardViewSearch(view: DashboardView): string {
   return params.size ? `?${params}` : "";
 }
 
-export function sortClientRows<T extends { count: number }>(
+function sortClientRows<T extends { count: number }>(
   rows: readonly T[],
   name: (row: T) => string,
   sort: DashboardView["sort"],
@@ -59,4 +61,34 @@ export function sortClientRows<T extends { count: number }>(
       ? direction * labelOrder
       : direction * (a.count - b.count) || labelOrder;
   });
+}
+/** One selection feeds the table and CSV; shares keep the full source denominator. */
+export function selectCensusRows(
+  census: Census,
+  { view, client, sort, order }: DashboardView,
+): Pick<Census, "clients" | "versions"> {
+  return {
+    clients:
+      view === "distribution"
+        ? sortClientRows(
+            census.clients.filter(
+              (row) => client === "all" || row.name === client,
+            ),
+            (row) => row.name,
+            sort,
+            order,
+          )
+        : [],
+    versions:
+      view === "versions"
+        ? sortClientRows(
+            census.versions.filter(
+              (row) => client === "all" || row.client === client,
+            ),
+            (row) => `${row.client}/${row.version}`,
+            sort,
+            order,
+          )
+        : [],
+  };
 }

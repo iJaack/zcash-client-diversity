@@ -64,7 +64,16 @@ export default function BlockTiming({
   const rows =
     data?.rows.filter(
       (row) => ["zebra", "zakura", "other"].includes(row.key) || row.blocks > 0,
-    ) ?? [];
+    ) ??
+    ["Zebra", "Zakura", "zcashd"].map((name) => ({
+      key: name,
+      name,
+      blocks: null,
+      timedBlocks: null,
+      meanSeconds: null,
+      medianSeconds: null,
+      p90Seconds: null,
+    }));
   return (
     <section className="block-timing" aria-labelledby="block-timing-title">
       <div className="section-heading">
@@ -162,50 +171,38 @@ export default function BlockTiming({
                 </tr>
               </thead>
               <tbody>
-                {data
-                  ? rows.map((row) => (
-                      <tr key={row.key}>
-                        <th scope="row">
-                          <span className="client-name">
-                            <i
-                              className="dot"
-                              style={{ backgroundColor: clientColor(row.name) }}
-                            />
-                            {row.name}
-                          </span>
-                          {row.blocks === 0 && (
-                            <span className="version-label">
-                              No tagged blocks
-                            </span>
-                          )}
-                        </th>
-                        <td className="timing-interval numeric">
-                          <strong>{duration(row[selectedMetric.field])}</strong>
-                        </td>
-                        <td className="numeric">
-                          {row.timedBlocks.toLocaleString()}
-                          <span className="timing-denominator">
-                            {" "}
-                            / {row.blocks.toLocaleString()}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  : ["Zebra", "Zakura", "zcashd"].map((name) => (
-                      <tr key={name}>
-                        <th scope="row">
-                          <span className="client-name">
-                            <i
-                              className="dot"
-                              style={{ backgroundColor: clientColor(name) }}
-                            />
-                            {name}
-                          </span>
-                        </th>
-                        <td className="timing-interval numeric">—</td>
-                        <td className="numeric">—</td>
-                      </tr>
-                    ))}
+                {rows.map((row) => (
+                  <tr key={row.key}>
+                    <th scope="row">
+                      <span className="client-name">
+                        <i
+                          className="dot"
+                          style={{ backgroundColor: clientColor(row.name) }}
+                        />
+                        {row.name}
+                      </span>
+                      {row.blocks === 0 && (
+                        <span className="version-label">No tagged blocks</span>
+                      )}
+                    </th>
+                    <td className="timing-interval numeric">
+                      {data ? (
+                        <strong>{duration(row[selectedMetric.field])}</strong>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="numeric">
+                      {row.timedBlocks?.toLocaleString() ?? "—"}
+                      {row.blocks !== null && (
+                        <span className="timing-denominator">
+                          {" "}
+                          / {row.blocks.toLocaleString()}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             {busy && !data && (

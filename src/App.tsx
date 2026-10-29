@@ -21,7 +21,7 @@ import { useDashboardView } from "./lib/useDashboardView.ts";
 import {
   dashboardViewSearch,
   parseDashboardView,
-  sortClientRows,
+  selectCensusRows,
 } from "./lib/dashboardView.ts";
 const repository = "https://github.com/iJaack/zcash-client-diversity";
 function currentViewUrl() {
@@ -52,7 +52,7 @@ function App() {
     const timer = setTimeout(() => setSharing("idle"), 3000);
     return () => clearTimeout(timer);
   }, [sharing]);
-  const focusClient = (client: string) =>
+  const toggleClientFocus = (client: string) =>
     updateView({ client: filter === client ? "all" : client });
   const shareView = async () => {
     const requestedUrl = currentViewUrl();
@@ -69,6 +69,9 @@ function App() {
   const timing = useBlockTiming();
   const refreshing = busy || timing.busy;
   const census = payload?.current.data ?? null;
+  const visibleRows = census
+    ? selectCensusRows(census, dashboardView)
+    : { clients: [], versions: [] };
   const focused = census?.clients.find((row) => row.name === filter);
   const history = payload?.history.data ?? [];
   const currentError = error ?? payload?.current.error;
@@ -91,28 +94,7 @@ function App() {
       [
         csvForCensus({
           ...census,
-          clients:
-            view === "distribution"
-              ? sortClientRows(
-                  census.clients.filter(
-                    (row) => filter === "all" || row.name === filter,
-                  ),
-                  (row) => row.name,
-                  sort,
-                  order,
-                )
-              : [],
-          versions:
-            view === "versions"
-              ? sortClientRows(
-                  census.versions.filter(
-                    (row) => filter === "all" || row.client === filter,
-                  ),
-                  (row) => `${row.client}/${row.version}`,
-                  sort,
-                  order,
-                )
-              : [],
+          ...visibleRows,
         }),
       ],
       { type: "text/csv;charset=utf-8" },
@@ -301,7 +283,7 @@ function App() {
                   key={row.name}
                   aria-label={`Focus on ${row.name}: ${row.count} IPs, ${row.share.toFixed(1)} percent`}
                   aria-pressed={filter === row.name}
-                  onClick={() => focusClient(row.name)}
+                  onClick={() => toggleClientFocus(row.name)}
                   style={{
                     width: `${row.share}%`,
                     background: clientColor(row.name),
@@ -335,7 +317,7 @@ function App() {
                 key={row.name}
                 className="distribution-key"
                 aria-pressed={filter === row.name}
-                onClick={() => focusClient(row.name)}
+                onClick={() => toggleClientFocus(row.name)}
                 disabled={!census}
               >
                 <i
@@ -430,7 +412,7 @@ function App() {
               <HistoryChart
                 points={history}
                 focusedClient={filter}
-                onFocusClient={focusClient}
+                onFocusClient={toggleClientFocus}
               />
             )}
             {history.length > 0 && (
@@ -444,6 +426,9 @@ function App() {
           </section>
           <ClientTable
             census={census}
+            rows={
+              view === "versions" ? visibleRows.versions : visibleRows.clients
+            }
             versions={view === "versions"}
             filter={filter}
             setFilter={(client) => updateView({ client })}
