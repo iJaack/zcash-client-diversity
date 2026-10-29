@@ -110,7 +110,7 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
               ? ` Lines are sampled to at most ${MAX_SERIES_POINTS} points per client.`
               : ""}
           </desc>
-          <rect width="760" height="260" fill="#fafaf7" />
+          <rect width="760" height="260" fill="var(--chart-surface)" />
           {[0, 25, 50, 75, 100].map((share) => {
             const y =
               HISTORY_PLOT.bottom -
@@ -122,14 +122,14 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
                   y1={y}
                   x2={HISTORY_PLOT.right}
                   y2={y}
-                  stroke="#dedfd7"
+                  stroke="var(--rule)"
                   strokeWidth="0.8"
                 />
                 <text
                   x="31"
                   y={y + 4}
                   textAnchor="end"
-                  fill="#73786e"
+                  fill="var(--muted)"
                   fontSize="11"
                 >
                   {share}%
@@ -175,7 +175,7 @@ export function HistoryChart({ points }: { points: HistoryPoint[] }) {
               x={tick.x}
               y="244"
               fontSize="11"
-              fill="#73786e"
+              fill="var(--muted)"
               textAnchor={
                 index === 0
                   ? "start"

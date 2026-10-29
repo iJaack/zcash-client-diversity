@@ -59,3 +59,11 @@ All **75 tests** and the production build pass. Added complete cursor traversal,
 Playwright/Chromium checked desktop 1440×1200 and mobile 390×844 / 320×760. The new interval values match the live aggregated API response; zero matching zcashd tags show unavailable timing rather than zero seconds. Median/p90 disclosure, existing version/client filtering, refresh failure and recovery, and first-load timing unavailability all passed without page errors. No horizontal document overflow appeared; the timing table fits the mobile viewport. Header, focus and body contrast were checked; the light canvas and body typography remain readable.
 
 The visible sample average and partial-coverage language describe indexed header observations. Software tags are self-reported and timing is not a controlled client-processing benchmark. No fastest-client claim is made.
+
+## Dark cypherpunk theme
+
+The stronger theme uses near-black surfaces, mint accents, sharp controls and a static title grid. The chart now shares the CSS surface/rule tokens, and client colors are brighter for dark backgrounds. Native controls declare a dark color scheme. Timing values and all data semantics are unchanged.
+
+The production build and all **75 tests** pass. Playwright/Chromium verified desktop 1440×1200 and mobile 390×844 / 320×844 using live API data. Page identity, meaningful content, no framework overlay, no console/page errors, matching dark chart surface, timing disclosure, version/client filtering, CSV export, history range controls and visible keyboard focus all passed. Both the document and timing table fit the narrowest viewport without horizontal overflow. An independent review checked first-load source failures, readable amber warnings, empty states and disabled export at 320px.
+
+Body/canvas contrast is 16.74:1; secondary text/panel is 8.13:1; control borders exceed 3:1 on hover. Every generated category hue retains at least 4.78:1 contrast for its share-bar labels. No dependencies or decorative animations were added. Browser control tools are unavailable in this session, so the installed Playwright/Chromium workflow was used. Public HTTPS browser checks use the existing TLS-verified Node fetch bridge through the managed proxy, as documented above.

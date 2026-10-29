@@ -1,4 +1,31 @@
-# Zcash observatory dashboard concept
+# ZecLens dashboard design
+
+## Current dark cypherpunk system
+
+The current design uses a near-black canvas, sharp panel borders, a faint static grid around the title and mint accents. Sans serif headings and explanatory copy keep the page easy to understand; data, metadata and controls use monospace. Decorative brackets frame the block-timing panel without covering content. No text glow, scanlines or added motion.
+
+| Role | Value |
+| --- | --- |
+| Canvas / chart | `#090e0c` |
+| Panel | `#101914` |
+| Hover | `#192a20` |
+| Body text | `#e8f0e9` |
+| Secondary text | `#a1b3a7` |
+| Accent / focus | `#8ef79b` |
+| Dividers | `#304638` |
+| Control borders | `#658270` |
+| Warning text / surface | `#e7bd64` / `#211d12` |
+| Zebra | `#65e69a` |
+| Zakura | `#e8be56` |
+| zcashd | `#8bb8e8` |
+
+Share-bar labels use dark ink on the bright client colors. Chart surfaces and rules share the CSS tokens so the plot integrates with the page. The timing sample and per-client intervals retain equal emphasis, seconds, sample counts and visible qualifications about software-speed comparisons. Controls keep visible keyboard focus; native selects use the dark color scheme. The established layout and mobile stacking remain unchanged.
+
+Body contrast is 16.74:1 against the canvas; secondary text is 8.13:1 on panels. Control borders exceed 3:1 even on hover surfaces. New client categories receive deterministic light colors that remain visible on the dark chart.
+
+The original light concept below records the initial direction. The current palette and geometry above supersede its surface styling.
+
+## Historical initial concept
 
 Visual target: `dashboard-concept.png`, a single desktop dashboard around 1440 × 1100. Design goal: let researchers understand the client mix among publicly reachable Zcash nodes, inspect provenance, and explore snapshots without implying a census of the whole network.
 

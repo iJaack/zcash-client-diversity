@@ -1,10 +1,10 @@
 const clientColors: Record<string, string> = {
-  zebra: "#24764e",
-  zakura: "#d5a629",
-  zcashd: "#677d9c",
-  seeder: "#b3aaa0",
-  unknown: "#858d91",
-  other: "#a3a89e",
+  zebra: "#65e69a",
+  zakura: "#e8be56",
+  zcashd: "#8bb8e8",
+  seeder: "#b8a897",
+  unknown: "#a3adb1",
+  other: "#b5bbae",
 };
 
 /** Stable across views, refreshes, and newly observed client categories. */
@@ -14,5 +14,5 @@ export function clientColor(name: string): string {
   let hash = 0;
   for (const character of key)
     hash = (Math.imul(hash, 31) + character.charCodeAt(0)) >>> 0;
-  return `hsl(${hash % 360} 38% 38%)`;
+  return `hsl(${hash % 360} 55% 65%)`;
 }
