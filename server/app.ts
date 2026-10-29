@@ -1,4 +1,6 @@
 import { createServer } from "node:http";
+import { createHostedTimingHandler } from "./hosted-timing.ts";
+import { createBlockTimingService } from "./block-timing.ts";
 import type { IncomingMessage, Server, ServerResponse } from "node:http";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
@@ -303,6 +305,9 @@ export interface AppOptions extends ServiceOptions {
 /** Importing this module opens no port and starts no worker or polling loop. */
 export function createAppServer(options: AppOptions = {}): Server {
   const service = createDashboardService(options);
+  const timingHandler = createHostedTimingHandler(
+    createBlockTimingService(options),
+  );
   const distDir =
     options.distDir ?? fileURLToPath(new URL("../dist", import.meta.url));
   return createServer((request, response) => {
@@ -314,6 +319,14 @@ export function createAppServer(options: AppOptions = {}): Server {
         url = new URL(request.url ?? "/", "http://localhost");
       } catch {
         send(response, 400, { error: "Invalid request URL." });
+        return;
+      }
+      if (url.pathname === "/api/block-timing") {
+        const result = await timingHandler(
+          new Request(url, { method: request.method ?? "GET" }),
+        );
+        response.writeHead(result.status, Object.fromEntries(result.headers));
+        response.end(await result.text());
         return;
       }
       if (url.pathname === "/api/dashboard") {

@@ -51,3 +51,11 @@ The first Vercel runtime check caught `.ts` import paths surviving compilation i
 ## Custom domain verification
 
 Connected **zeclens.dev** and its www redirect after GoDaddy DNS changes. Vercel reports both names correctly configured with no DNS conflicts. HTTPS certificate covers both names and has automatic renewal enabled. Anonymous HTTPS checks returned 200 for the apex and the live API, and www returned 308 to https://zeclens.dev/. Browser checks on the custom domain verified live data, both history ranges, client/version filtering, CSV download and mobile layout without page errors. The managed browser proxy CA is not trusted directly by Chromium, so production browser resource reads used Node’s TLS-verified fetch through the inherited proxy; TLS verification was kept enabled.
+
+## Cypherpunk refinement and block timing
+
+All **75 tests** and the production build pass. Added complete cursor traversal, canonical anchor revalidation, signed/missing interval handling, fixed-source/query boundaries, capture deadlines, rate-limit backoff, stale states and UTC-midnight cache checks. The compiled-entrypoint check covers both API routes.
+
+Playwright/Chromium checked desktop 1440×1200 and mobile 390×844 / 320×760. The new interval values match the live aggregated API response; zero matching zcashd tags show unavailable timing rather than zero seconds. Median/p90 disclosure, existing version/client filtering, refresh failure and recovery, and first-load timing unavailability all passed without page errors. No horizontal document overflow appeared; the timing table fits the mobile viewport. Header, focus and body contrast were checked; the light canvas and body typography remain readable.
+
+The visible sample average and partial-coverage language describe indexed header observations. Software tags are self-reported and timing is not a controlled client-processing benchmark. No fastest-client claim is made.

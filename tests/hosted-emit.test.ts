@@ -27,6 +27,10 @@ test("compiled hosted entrypoint resolves every relative module without TypeScri
       "server/hosted.ts",
       "server/app.ts",
       "src/lib/census.ts",
+      "api/block-timing.ts",
+      "server/hosted-timing.ts",
+      "server/block-timing.ts",
+      "src/lib/blockTiming.ts",
     ]) {
       const source = await readFile(join(root, name), "utf8");
       const output = ts.transpileModule(source, {
@@ -44,6 +48,13 @@ test("compiled hosted entrypoint resolves every relative module without TypeScri
       new Request("https://zeclens.vercel.app/api/dashboard?period=invalid"),
     );
     assert.equal(response.status, 400);
+    const timingRoute = await import(
+      pathToFileURL(join(folder, "api/block-timing.js")).href
+    );
+    const timingResponse = await timingRoute.GET(
+      new Request("https://zeclens.dev/api/block-timing?host=other.test"),
+    );
+    assert.equal(timingResponse.status, 400);
   } finally {
     await rm(folder, { recursive: true, force: true });
   }

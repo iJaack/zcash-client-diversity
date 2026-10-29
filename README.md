@@ -49,3 +49,9 @@ See [API research and provenance](docs/API-SOURCES.md) for verified endpoints, s
 - `design/`: visual reference and implementation tokens
 
 Production domain: https://zeclens.dev. The www hostname redirects to the apex; https://zeclens.vercel.app remains available as a hosting fallback. The repository includes a Vercel Web handler in `api/dashboard.ts`, which reuses the local server’s data validation. Successful public API responses have a 60-second Vercel CDN cache with a 120-second stale-while-revalidate window. In-process last-good data and request coalescing are best effort per function instance; a cold start can have no cached data. No analytics, wallet connection, account system, or secret is required.
+
+## Block timing
+
+The highlighted timing view groups observed block-header intervals by the self-reported client tag on each winning block. It uses the previous UTC-day window for every client and reports the average plus timed/returned sample counts; median and 90th-percentile intervals are available in the explanation. These observations depend on mining power, difficulty, chance and header timestamps. They are not controlled measurements of client processing or block-template generation speed.
+
+`/api/block-timing` reads every matching indexed block through fixed ZecBlock cursor URLs, rechecks its first-page anchor, and discards incomplete or inconsistent captures. It has a 15-second total deadline, a five-minute per-instance cache and bounded CDN caching that expires by UTC midnight. Coverage can be partial if the upstream index is behind. The route creates no scheduled work. See [timing sources and methodology](docs/PERFORMANCE-SOURCES.md).

@@ -10,6 +10,8 @@ import {
 import { useDashboard } from "./lib/useDashboard.ts";
 import { csvForCensus } from "./lib/census.ts";
 import { clientColor } from "./lib/colors.ts";
+import BlockTiming from "./components/BlockTiming.tsx";
+import { useBlockTiming } from "./lib/useBlockTiming.ts";
 import ClientTable from "./components/ClientTable.tsx";
 import HistoryChart from "./components/HistoryChart.tsx";
 import Methodology from "./components/Methodology.tsx";
@@ -33,6 +35,8 @@ function App() {
   const [view, setView] = useState<"distribution" | "versions">("distribution");
   const [filter, setFilter] = useState("all");
   const { payload, busy, error, refresh } = useDashboard(period);
+  const timing = useBlockTiming();
+  const refreshing = busy || timing.busy;
   const census = payload?.current.data ?? null;
   const history = payload?.history.data ?? [];
   const currentError = error ?? payload?.current.error;
@@ -120,11 +124,13 @@ function App() {
             </button>
             <button
               className="button primary"
-              onClick={() => void refresh()}
-              disabled={busy}
+              onClick={() => {
+                void Promise.allSettled([refresh(), timing.refresh()]);
+              }}
+              disabled={refreshing}
             >
-              <RefreshCw size={16} className={busy ? "spinning" : ""} />
-              {busy ? "Refreshing" : "Refresh"}
+              <RefreshCw size={16} className={refreshing ? "spinning" : ""} />
+              {refreshing ? "Refreshing" : "Refresh"}
             </button>
           </div>
         </div>
@@ -268,6 +274,11 @@ function App() {
             shares Zebra’s lineage.
           </p>
         </section>
+        <BlockTiming
+          resource={timing.resource}
+          busy={timing.busy}
+          error={timing.error}
+        />
         <div className="analytics-grid">
           <section className="history" aria-labelledby="history-title">
             <div className="section-heading">

@@ -60,3 +60,9 @@ The image deliberately contains no invented numbers, dates, versions, or trend l
 3. **Geometry:** use a wide low share bar, aligned left edges, thin rules, compact controls, and a spacious lower two-column region. Keep the footer within the practical desktop composition.
 4. **Data honesty:** pending states show dashes and a neutral track. Connected states may deliberately differ from the image by showing real counts and shares, but must retain clear provenance and methodological limits.
 5. **Responsive and interaction fidelity:** controls remain recognizable and reachable, labels and numbers remain readable, the lower columns stack cleanly, and every visible control produces its stated result or a clear unavailable state.
+
+## Restrained cypherpunk refinement
+
+The requested refinement keeps the light reading canvas and existing layout. The header now uses forest ink `#14281e`, mint `#8cdbad` hairlines, and high-contrast navigation. Body text stays sans serif; data, controls and metadata use the system monospace stack. Corners and dividers are crisper without glow, noise or decorative motion. Current text is `#18231c`, muted text `#626b61`, and the rule color `#d2dbce`. Client colors retain their existing meanings.
+
+A quiet full-width timing band sits below the node distribution. Its sample average and client-tag table use neutral emphasis, explicit seconds and sample counts; no winner color or fastest-client ranking. Mobile stacks the sample average above a compact three-column table. The data view is observed mining activity, with software-speed qualifications kept visible.

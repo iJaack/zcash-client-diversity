@@ -5,14 +5,25 @@
   "installCommand": "npm ci",
   "outputDirectory": "dist",
   "functions": {
-    "api/dashboard.ts": { "maxDuration": 30 }
+    "api/dashboard.ts": {
+      "maxDuration": 30
+    },
+    "api/block-timing.ts": {
+      "maxDuration": 30
+    }
   },
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
     }
   ]
