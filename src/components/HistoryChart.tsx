@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import type { HistoryPoint } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
@@ -15,12 +15,27 @@ import {
   resolveObservationSelection,
 } from "../lib/historyInteraction.ts";
 import type { ObservationSelection } from "../lib/historyInteraction.ts";
+import {
+  compareObservations,
+  historyWindow,
+  resolvePinnedObservation,
+  type HistoryZoom,
+} from "../lib/historyExploration.ts";
+import "./HistoryChart.css";
 
 const shareFormat = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1,
 });
 const countFormat = new Intl.NumberFormat("en-US");
+const countChangeFormat = new Intl.NumberFormat("en-US", {
+  signDisplay: "exceptZero",
+});
+const shareChangeFormat = new Intl.NumberFormat("en-US", {
+  signDisplay: "exceptZero",
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -51,7 +66,23 @@ export function HistoryChart({
   onFocusClient?: (client: string) => void;
 }) {
   const id = useId();
-  const history = useMemo(() => buildLinePaths(points), [points]);
+  const [zoom, setZoom] = useState<HistoryZoom>("full");
+  const fullPoints = useMemo(() => historyWindow(points, "full"), [points]);
+  const history = useMemo(
+    () =>
+      buildLinePaths(
+        zoom === "full" ? fullPoints : historyWindow(fullPoints, zoom),
+      ),
+    [fullPoints, zoom],
+  );
+  const [pinned, setPinned] = useState<HistoryPoint | null>(null);
+  const baseline = useMemo(
+    () => resolvePinnedObservation(fullPoints, pinned),
+    [fullPoints, pinned],
+  );
+  useEffect(() => {
+    if (pinned && !baseline) setPinned(null);
+  }, [pinned, baseline]);
   const times = useMemo(
     () => history.points.map((point) => Date.parse(point.at)),
     [history.points],
@@ -85,7 +116,7 @@ export function HistoryChart({
     if (index !== null) selectIndex(index);
   };
   const downloadHistory = () => {
-    const blob = new Blob([historyCsv(history.points)], {
+    const blob = new Blob([historyCsv(fullPoints)], {
       type: "text/csv;charset=utf-8",
     });
     const url = URL.createObjectURL(blob);
@@ -98,14 +129,45 @@ export function HistoryChart({
   const comparable = history.points.filter(
     (point) => point.total > 0 && point.clients.length > 0,
   );
+  const explorationControls = fullPoints.length > 0 && (
+    <div className="history-exploration">
+      <div className="history-zoom" role="group" aria-label="Zoom history">
+        <span>Zoom</span>
+        {(
+          [
+            ["full", "Full window"],
+            ["24h", "Last 24h"],
+            ["6h", "Last 6h"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            type="button"
+            className="chart-control"
+            key={value}
+            aria-pressed={zoom === value}
+            onClick={() => setZoom(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <p className="history-window-summary" role="status">
+        {countFormat.format(history.points.length)} recorded observations ·{" "}
+        {timestampFormat.format(history.start)}–
+        {timestampFormat.format(history.end)} UTC
+        {zoom !== "full" && " · Window ends at the latest source observation."}
+      </p>
+    </div>
+  );
   if (
     comparable.length < 2 ||
     !history.series.some((series) => series.sourcePointCount > 1)
   ) {
     return (
       <>
+        {explorationControls}
         <div className="empty-state">No comparable history available.</div>
-        {history.points.length > 0 && (
+        {fullPoints.length > 0 && (
           <button
             type="button"
             className="history-export"
@@ -118,6 +180,17 @@ export function HistoryChart({
     );
   }
   const latest = history.points.at(-1)!;
+  const comparison = baseline ? compareObservations(baseline, selected) : null;
+  const baselineTime = baseline ? Date.parse(baseline.at) : null;
+  const baselineX =
+    baselineTime !== null &&
+    baselineTime >= history.start &&
+    baselineTime <= history.end &&
+    history.end > history.start
+      ? HISTORY_PLOT.left +
+        ((baselineTime - history.start) / (history.end - history.start)) *
+          (HISTORY_PLOT.right - HISTORY_PLOT.left)
+      : null;
   const selectedX =
     history.end > history.start
       ? HISTORY_PLOT.left +
@@ -136,6 +209,7 @@ export function HistoryChart({
   }));
   return (
     <>
+      {explorationControls}
       <div
         className="history-plot-scroll"
         tabIndex={0}
@@ -182,8 +256,9 @@ export function HistoryChart({
             Hover or tap to inspect a recorded observation. The timeline slider
             and previous/next buttons provide keyboard access to every original
             observation, including points omitted from the drawn lines. The full
-            history CSV download contains every observation in the selected time
-            window.
+            history CSV download contains every observation in the requested
+            seven-day or thirty-day window, including observations outside this
+            zoom.
             {sampled
               ? ` Lines are sampled to at most ${MAX_SERIES_POINTS} points per client.`
               : ""}
@@ -242,9 +317,9 @@ export function HistoryChart({
               ))}
               {series.segments
                 .filter((segment) => segment.length === 1)
-                .map((segment) => (
+                .map((segment, segmentIndex) => (
                   <circle
-                    key={segment[0].time}
+                    key={`${segment[0].time}-${segmentIndex}`}
                     cx={segment[0].x}
                     cy={segment[0].y}
                     r="2.2"
@@ -259,6 +334,18 @@ export function HistoryChart({
             pointerEvents="none"
             aria-hidden="true"
           >
+            {baselineX !== null && (
+              <line
+                className="chart-baseline"
+                x1={baselineX}
+                x2={baselineX}
+                y1={HISTORY_PLOT.top}
+                y2={HISTORY_PLOT.bottom}
+                stroke="var(--green)"
+                strokeWidth="2"
+                strokeDasharray="6 4"
+              />
+            )}
             <line
               x1={selectedX}
               x2={selectedX}
@@ -463,12 +550,104 @@ export function HistoryChart({
             </button>
           </div>
         </div>
+        <div className="history-comparison-actions">
+          <button
+            type="button"
+            className="chart-control"
+            onClick={() => setPinned(selected)}
+            disabled={baseline === selected}
+          >
+            {baseline ? "Replace baseline" : "Pin for comparison"}
+          </button>
+          {baseline && (
+            <button
+              type="button"
+              className="chart-control"
+              onClick={() => setPinned(null)}
+            >
+              Clear comparison
+            </button>
+          )}
+        </div>
+        {baseline && comparison && (
+          <section
+            className="history-comparison"
+            aria-labelledby={`${id}-comparison-title`}
+          >
+            <h4 id={`${id}-comparison-title`}>
+              Change from pinned observation
+            </h4>
+            <p className="history-comparison-caption">
+              Baseline: {timestampFormat.format(Date.parse(baseline.at))} UTC
+              {baselineX === null
+                ? " · Outside this zoom"
+                : " · Dashed green line"}
+            </p>
+            {comparison.reason ? (
+              <p className="inline-warning">{comparison.reason}</p>
+            ) : (
+              <>
+                <div className="history-comparison-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">Client</th>
+                        <th
+                          scope="col"
+                          className="numeric"
+                          aria-label="Change in observed IPs"
+                        >
+                          Δ IPs
+                        </th>
+                        <th
+                          scope="col"
+                          className="numeric"
+                          aria-label="Change in share, percentage points"
+                        >
+                          Δ Share
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparison.rows.map((row) => (
+                        <tr
+                          key={row.name}
+                          data-focused={focusedClient === row.name}
+                        >
+                          <th scope="row">{row.name}</th>
+                          <td className="numeric">
+                            {row.countChange === null
+                              ? "—"
+                              : countChangeFormat.format(row.countChange)}
+                          </td>
+                          <td className="numeric">
+                            {row.shareChange === null
+                              ? "—"
+                              : `${shareChangeFormat.format(row.shareChange)} pp`}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="history-comparison-caption">
+                  Move along the timeline to compare. Share changes are
+                  percentage points (pp); each sample keeps its own full
+                  population.
+                  {comparison.rows.some((row) => row.countChange === null) &&
+                    " A dash means that client was not measured in both samples."}
+                </p>
+              </>
+            )}
+          </section>
+        )}
       </section>
       <details className="history-details">
         <summary>View latest {recent.length} observations as a table</summary>
         <p>
-          All {countFormat.format(history.points.length)} observations in this
-          time window are available as a CSV.
+          All {countFormat.format(fullPoints.length)} observations in the
+          requested time window are available as a CSV, including those outside
+          this zoom.
         </p>
         <button
           type="button"

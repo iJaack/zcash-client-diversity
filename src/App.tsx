@@ -434,6 +434,10 @@ function App() {
             setFilter={(client) => updateView({ client })}
             sort={sort}
             order={order}
+            onExploreClient={(client) =>
+              updateView({ client, view: "versions" })
+            }
+            onBack={() => updateView({ client: "all", view: "distribution" })}
             onSort={(column) =>
               updateView({
                 sort: column,

@@ -4,7 +4,11 @@
 
 A source-backed dashboard for the advertised clients observed on Zcash mainnet. It shows current client shares, compatible historical shares, and the source’s top reported versions, with CSV export and explicit data coverage.
 
-Select a client from the distribution or chart legend to focus the history and table. Hover or tap the timeline to inspect a recorded sample, or use the keyboard slider and Previous/Next controls. Table headers sort clients and node counts; CSV follows the displayed grouping, filter and order. **Share view** copies the client focus, range, grouping, sort and timing statistic into a link that also works with browser Back/Forward. Timeline inspection is temporary and does not change the shared link or trigger network requests.
+Select a client from the distribution or chart legend to focus the history and table. Select a breakdown row to explore its reported versions. Hover or tap the timeline to inspect a recorded sample, or use the keyboard slider and Previous/Next controls. Zoom into the last 24 or 6 recorded hours, then pin an observation to compare changes in client counts and shares. Full-history CSV still includes the entire requested window.
+
+Block-timing bars switch between Average, Median and P90. Select a tag to inspect all three statistics and its sample size; the full table is available on demand. These are observed block intervals, not a controlled comparison of client processing speed.
+
+Table headers sort clients and node counts; current CSV follows the displayed grouping, filter and order. **Share view** copies the client focus, requested range, grouping, sort and timing statistic into a link that also works with browser Back/Forward. Timeline zoom, pinned comparisons and timing-detail selections are temporary and do not change the shared link or trigger network requests.
 
 ![Dashboard preview](design/dashboard-preview.png)
 

@@ -1,5 +1,7 @@
 # Verification — 29 October 2026
 
+Latest verification: **91 tests**, production build and unused-local/parameter checks pass. The entries below retain the verification history; the latest exploration checks are recorded at the end.
+
 ## Result
 
 Production build and TypeScript check pass. All **29 named tests** pass with `npm test`. Production dependencies: `npm audit --omit=dev` reports zero vulnerabilities. Source content was reviewed for secrets and private context before publication.
@@ -83,3 +85,11 @@ Applied [AI Slop Cleaner](https://github.com/yeachan-heo/oh-my-claudecode/blob/H
 The build, all **83 tests**, and TypeScript's unused-local/unused-parameter checks pass. Timing row DOM matched exactly before/after for unavailable, zero, negative and missing intervals across all 3 metrics, and live statistics matched the API. CSS comparison covered 25 states and 69 selectors at 1440, 1100, 760, 390 and 320px: every computed property matched, and all 5 before/after screenshot hashes were identical. Duplicate-record browser regression preserved all 6 table rows and traversed all 3 original observations without console errors. Separate read-only review found no remaining actionable issues. No dependencies, source/API behavior or visual redesign were introduced.
 
 The complete live-data interaction suite passed again after cleanup, including table/CSV order, metric values, timeline inspection, shared links, clipboard failures, browser history and mobile touch scrolling, with no page errors.
+
+## Deeper interactive exploration
+
+All **91 tests**, the production build and TypeScript unused-local/parameter checks pass. Eight new focused tests cover zoom boundaries, duplicate timestamps, immutable source records, pin identity across refresh, percentage-point math, missing/cross-census comparisons, and signed/zero/unavailable interval geometry.
+
+Independent fixture browser review passed at 1440px and 390/320px: timing bar keyboard selection/reset, signed/zero/missing values, axis alignment, UTC-day rollover, unavailable states, version drilldown, zoom/reset including a single-record window, duplicate-time baseline comparisons, incompatible census/empty-population refusal, and baseline retention/removal on refresh. Review caught and resolved duplicate singleton SVG keys and chart-axis padding alignment. Timeline controls keep their position when a comparison is pinned; full CSV retains records outside the selected zoom.
+
+Live-source browser checks confirmed chart metrics and selected-tag details match the API, version drilldown restores through Back/Forward, zoom uses source timestamps, and pinned differences match original counts and shares. At 390/320px the document, timing chart, expanded table and comparison panel fit the viewport. Local exploration adds no API requests. Existing CSV ordering, shared links, clipboard failure/race handling, actual-observation inspection, and native touch scrolling also pass without page errors. No dependency or backend/API change was needed.

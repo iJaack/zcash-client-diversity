@@ -1,0 +1,28 @@
+.client-drilldown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+
+.client-drilldown:hover {
+  color: var(--green);
+}
+
+.client-drilldown > svg {
+  color: var(--muted);
+}
+
+.breakdown-back {
+  min-height: 44px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}

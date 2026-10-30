@@ -33,6 +33,14 @@ The history inspector uses original observations, including points omitted from 
 
 Average/Median/P90 switches only the per-tag interval statistic, with a short definition and sample counts; the overview remains the sample average and software-speed caveat stays visible. Share view captures client, date range, grouping, sort and statistic in the URL; Back/Forward restores the same controls. Hover/scrubber selection is temporary. Copy feedback follows the actual clipboard result, ignores stale completions after a view change and offers a selectable link when clipboard access fails. No persistence, background polling or charting dependency is added.
 
+## Exploration additions
+
+History zoom narrows the already loaded observations to the last 24 or 6 hours, anchored to the latest source record. Full window resets it. Actual UTC coverage and record counts stay visible, including when sparse data leaves only one point; reset and the full CSV remain available. Pinning an inspected record adds count changes and percentage-point changes against another recorded sample. Different census methods and missing measurements remain incomparable. The baseline survives zoom and refresh only while its exact source record remains present. Timeline controls keep their position as comparison results expand below them.
+
+Block timing uses a compact horizontal chart on a shared signed scale with zero explicitly represented. Clicking or keyboard-activating a tag opens its Average/Median/P90 values and timed/total counts; selection toggles or clears explicitly. The overall sample average stays fixed when the displayed per-tag statistic changes. A table disclosure provides an alternative representation. The previous duplicate statistics table was removed. Selecting a client breakdown row opens its reported versions and updates the existing shared URL state; Back to client breakdown resets the grouping and client.
+
+These additions use the existing request/refresh model and retain its explicit delayed, stale, unavailable and partial-coverage states. All exploration except changing the requested 7/30-day range stays local. No polling, persistence or dependency is added. The page renders one SVG history chart (at most 1,500 drawn points per client) and at most six timing bars. Original records remain available to the inspector and CSV; zoom reuses the same bounded drawing pipeline. Native buttons, range controls and disclosures support keyboard and touch, and the history plot retains native horizontal scrolling on mobile. Component styles stay next to their components.
+
 ## Historical initial concept
 
 Visual target: `dashboard-concept.png`, a single desktop dashboard around 1440 × 1100. Design goal: let researchers understand the client mix among publicly reachable Zcash nodes, inspect provenance, and explore snapshots without implying a census of the whole network.

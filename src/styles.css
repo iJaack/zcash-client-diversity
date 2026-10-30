@@ -595,10 +595,6 @@ h2 {
   max-width: 100ch;
   margin: 12px 0;
 }
-.timing-details table {
-  font-size: 12px;
-  margin-top: 12px;
-}
 .analytics-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);

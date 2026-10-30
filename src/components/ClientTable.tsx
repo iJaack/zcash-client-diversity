@@ -1,7 +1,14 @@
 import type { Census, ClientRow, VersionRow } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
 import type { DashboardView } from "../lib/dashboardView.ts";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronRight,
+} from "lucide-react";
+import "./ClientTable.css";
 export default function ClientTable({
   census,
   rows,
@@ -11,6 +18,8 @@ export default function ClientTable({
   sort,
   order,
   onSort,
+  onExploreClient,
+  onBack,
 }: {
   census: Census | null;
   rows: readonly (ClientRow | VersionRow)[];
@@ -20,6 +29,8 @@ export default function ClientTable({
   sort: DashboardView["sort"];
   order: DashboardView["order"];
   onSort: (column: DashboardView["sort"]) => void;
+  onExploreClient: (client: string) => void;
+  onBack: () => void;
 }) {
   const clients = census?.clients ?? [];
   const sortIcon = (column: DashboardView["sort"]) =>
@@ -37,6 +48,11 @@ export default function ClientTable({
           {versions ? "Reported versions" : "Client breakdown"}
         </h2>
       </div>
+      {versions && (
+        <button className="clear-focus breakdown-back" onClick={onBack}>
+          <ArrowLeft size={14} /> Back to client breakdown
+        </button>
+      )}
       <label className="filter-label">
         Show client
         <select
@@ -96,6 +112,15 @@ export default function ClientTable({
             {census
               ? rows.map((row) => {
                   const name = "name" in row ? row.name : row.client;
+                  const clientName = (
+                    <span className="client-name">
+                      <i
+                        className="dot"
+                        style={{ backgroundColor: clientColor(name) }}
+                      />
+                      {name}
+                    </span>
+                  );
                   return (
                     <tr
                       key={
@@ -105,13 +130,18 @@ export default function ClientTable({
                       }
                     >
                       <th scope="row">
-                        <span className="client-name">
-                          <i
-                            className="dot"
-                            style={{ backgroundColor: clientColor(name) }}
-                          />
-                          {name}
-                        </span>
+                        {"version" in row ? (
+                          clientName
+                        ) : (
+                          <button
+                            className="client-drilldown"
+                            onClick={() => onExploreClient(name)}
+                            aria-label={`Explore ${name} versions`}
+                          >
+                            {clientName}
+                            <ChevronRight size={14} aria-hidden="true" />
+                          </button>
+                        )}
                         {"version" in row && (
                           <span className="version-label">{row.version}</span>
                         )}
@@ -157,6 +187,11 @@ export default function ClientTable({
           ? "Top 12 client/version pairs returned by the source. Shares use all observed IPs; rows may not sum to 100%."
           : "Share of all observed active IPs, including seeders and unidentified peers. Client names are self-reported."}
       </p>
+      {!versions && census && (
+        <p className="fine-print">
+          Select a client row to explore its reported versions.
+        </p>
+      )}
     </section>
   );
 }
