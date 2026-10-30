@@ -2,6 +2,8 @@ import { ArrowUpRight } from "lucide-react";
 import type { Census } from "../lib/census.ts";
 const source =
   "https://github.com/Kenbak/zecblock/blob/68bc0676db14214c533c4317bf5e3f36257c13c6/server/deploy/COMBINED-NODE-CENSUS.md";
+const audit =
+  "https://github.com/iJaack/zcash-client-diversity/blob/main/docs/METHODOLOGY-AUDIT.md";
 export default function Methodology({ census }: { census: Census | null }) {
   return (
     <section
@@ -13,8 +15,10 @@ export default function Methodology({ census }: { census: Census | null }) {
         <span className="eyebrow">HOW TO READ THIS</span>
         <h2 id="methodology-title">One view of the network.</h2>
         <p>
-          Observed IPs reveal the software this source sees. They do not measure
-          mining power, independent operators, or every Zcash full node.
+          ZecBlock is the single observation source. Its observed IP mix is a
+          sample shaped by discovery and peering, with no guarantee that it
+          represents every Zcash full node or independent operator. IP shares do
+          not measure mining power.
         </p>
         <a href={source} target="_blank" rel="noreferrer">
           Source methodology <ArrowUpRight size={15} />
@@ -33,7 +37,8 @@ export default function Methodology({ census }: { census: Census | null }) {
               ? Math.round(census.crawlerWindowSeconds / 60)
               : 60}{" "}
             minutes, deduplicated by IP. Ports on one IP collapse; IPv4 and IPv6
-            remain separate.
+            remain separate. Local peers can enter this sample without the
+            crawler’s checkpoint challenge.
           </p>
           {census && (
             <p className="sample-counts">
@@ -60,12 +65,18 @@ export default function Methodology({ census }: { census: Census | null }) {
           </p>
         </div>
         <div>
-          <h3>A consistent baseline</h3>
+          <h3>Separate snapshots, shared methodology</h3>
           <p>
-            Census v3 filters foreign-chain crawler responses using a Zcash
-            checkpoint. Earlier v2 observations are not comparable. The API’s
-            compatible history starts on October 19, 2026; requested periods may
-            have less coverage.
+            History uses the source’s census v3 filter; earlier v2 observations
+            are not comparable. The chart shows actual returned coverage.
+            Current counts and history are captured separately, so nearby
+            timestamps can have different counts.
+          </p>
+          <p className="sample-counts">
+            <a href={audit} target="_blank" rel="noreferrer">
+              Read the dated data audit <ArrowUpRight size={12} />
+            </a>
+            . It records the checks and their limits.
           </p>
         </div>
         <div>

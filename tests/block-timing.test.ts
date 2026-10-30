@@ -482,18 +482,45 @@ test("all cursor pages share one deadline", async () => {
   assert.equal(signals.at(-1)?.aborted, true);
 });
 
-test("the anchor reread shares the capture deadline", async () => {
+test("the anchor reread shares the capture deadline", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  let elapsed = 0;
+  t.mock.method(performance, "now", () => elapsed);
   let reads = 0;
+  let releaseFirst!: () => void;
+  const firstRead = new Promise<void>((resolve) => {
+    releaseFirst = resolve;
+  });
+  let startedAnchor!: () => void;
+  const anchorStarted = new Promise<void>((resolve) => {
+    startedAnchor = resolve;
+  });
+  let anchorSignal: AbortSignal | undefined;
   const service = createBlockTimingService({
     now: () => NOW,
     timeoutMs: 45,
-    fetch: async () => {
+    fetch: async (_url, init) => {
       reads += 1;
-      await new Promise((resolve) => setTimeout(resolve, 30));
-      return json(page([block(3)]));
+      if (reads === 1) {
+        await firstRead;
+        return json(page([block(3)]));
+      }
+      anchorSignal = init!.signal as AbortSignal;
+      startedAnchor();
+      return new Promise<Response>(() => {});
     },
   });
-  const result = await service.getTiming();
+  const capture = service.getTiming();
+  elapsed = 30;
+  t.mock.timers.tick(30);
+  releaseFirst();
+  await anchorStarted;
+  assert.equal(anchorSignal?.aborted, false);
+  elapsed = 45;
+  t.mock.timers.tick(15);
+  // The anchor only gets the remaining 15ms, never a new 45ms budget.
+  assert.equal(anchorSignal?.aborted, true);
+  const result = await capture;
   assert.equal(reads, 2);
   assert.equal(result.data, null);
   assert.match(result.error!, /timed out/);

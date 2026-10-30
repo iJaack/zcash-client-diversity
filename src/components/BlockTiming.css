@@ -1,3 +1,21 @@
+.timing-context {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--green);
+  background: var(--canvas);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.timing-context strong {
+  color: var(--ink);
+}
+.timing-overview .timing-capture {
+  margin-top: 12px;
+  color: var(--muted);
+  font: 11px/1.7 var(--mono);
+  overflow-wrap: anywhere;
+}
 .timing-chart {
   margin: 0 0 18px;
 }

@@ -1,6 +1,6 @@
 # Verification — 29 October 2026
 
-Latest verification: **91 tests**, production build and unused-local/parameter checks pass. The entries below retain the verification history; the latest exploration checks are recorded at the end.
+Latest verification: **93 tests**, production build and unused-local/parameter checks pass. The entries below retain the verification history; the final release checks are recorded at the end.
 
 ## Result
 
@@ -93,3 +93,13 @@ All **91 tests**, the production build and TypeScript unused-local/parameter che
 Independent fixture browser review passed at 1440px and 390/320px: timing bar keyboard selection/reset, signed/zero/missing values, axis alignment, UTC-day rollover, unavailable states, version drilldown, zoom/reset including a single-record window, duplicate-time baseline comparisons, incompatible census/empty-population refusal, and baseline retention/removal on refresh. Review caught and resolved duplicate singleton SVG keys and chart-axis padding alignment. Timeline controls keep their position when a comparison is pinned; full CSV retains records outside the selected zoom.
 
 Live-source browser checks confirmed chart metrics and selected-tag details match the API, version drilldown restores through Back/Forward, zoom uses source timestamps, and pinned differences match original counts and shares. At 390/320px the document, timing chart, expanded table and comparison panel fit the viewport. Local exploration adds no API requests. Existing CSV ordering, shared links, clipboard failure/race handling, actual-observation inspection, and native touch scrolling also pass without page errors. No dependency or backend/API change was needed.
+
+## Final release: freshness and measurement clarity
+
+The build, all **93 tests**, and unused-local/parameter checks pass. Shared age handling has boundary tests for the 15-minute warning, UTC rollover, long ages, invalid timestamps and clock skew. An existing anchor-deadline test exposed a wall-clock scheduling dependency under concurrent browser load; it now uses a controlled monotonic clock and timers to verify that the anchor receives only the remaining capture budget.
+
+Independent browser regression reproduced the audit's idle-midnight and stalled-history cases, then verified the new warnings. Fresh census data alongside old history gives a history-specific notice. An older timing day identifies the expected complete UTC day. Clock skew, a source read older than 15 minutes, refresh recovery, HTTP503 last-good retention, and first-load unavailability all remain explicit. Returning to a tab updates ages immediately without additional requests. The page discloses manual snapshots and cached responses.
+
+The visible timing title and upfront qualification describe observed intervals rather than client performance. Tag details no longer describe a client as above or below the sample average. Methodology links the dated independent data audit and explains the source's sample limits and separate snapshot clocks.
+
+Live-data suites passed at desktop and 390/320px, retaining chart selection, metric values, zoom, pinned comparisons, version drilldown, CSV order, share links, browser navigation, clipboard failure/race handling and native touch scrolling. Keyboard, warning, unavailable and selected states fit the mobile viewport. No page errors, new dependency, polling or backend/API change.

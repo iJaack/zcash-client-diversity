@@ -4,6 +4,8 @@
 
 A source-backed dashboard for the advertised clients observed on Zcash mainnet. It shows current client shares, compatible historical shares, and the source’s top reported versions, with CSV export and explicit data coverage.
 
+**Manual snapshots:** use Refresh to check for updates; caches can return the same source observation. Census, history and interval samples show their own timestamps and ages. Delayed records and an older UTC-day timing sample have separate warnings, including when a tab is left open or resumed later.
+
 Select a client from the distribution or chart legend to focus the history and table. Select a breakdown row to explore its reported versions. Hover or tap the timeline to inspect a recorded sample, or use the keyboard slider and Previous/Next controls. Zoom into the last 24 or 6 recorded hours, then pin an observation to compare changes in client counts and shares. Full-history CSV still includes the entire requested window.
 
 Block-timing bars switch between Average, Median and P90. Select a tag to inspect all three statistics and its sample size; the full table is available on demand. These are observed block intervals, not a controlled comparison of client processing speed.
@@ -42,9 +44,11 @@ Requests go through the same-origin backend because upstream restricts browser o
 
 **These are observed active unique IPs, not all nodes, operators, or mining share.** The census combines local peers and chain-qualified crawler responses. Client names are self-reported; Zakura forks Zebra, so advertised client mix is not independent implementation diversity. Seeders and unknown clients remain in the full denominator. The version view contains at most 12 upstream client/version pairs and may not sum to 100%.
 
-Observation time comes from `stats.lastUpdated`, not API response generation time. The UI marks current observations older than 15 minutes as delayed. History uses the source’s v3 route contract and excludes explicit non-v3 points. The source filters v3 in SQL even though its API omits per-point version fields. Missing intervals and incompatible versions are not connected in the plot. Thirty requested days can have fewer available observations.
+Observation time comes from `stats.lastUpdated`, not API response generation time. Census and history observations older than 15 minutes have independent warnings. Timing also warns if its source read is older than 15 minutes or its day is no longer the latest complete UTC day. Timestamps more than two minutes ahead of the device clock prompt a clock check. The displayed ages update locally every 30 seconds and immediately on tab focus/visibility changes; this does not fetch new data.
 
-See [API research and provenance](docs/API-SOURCES.md) for verified endpoints, source implementation links, and excluded sources.
+History uses the source’s v3 route contract and excludes explicit non-v3 points. The source filters v3 in SQL even though its API omits per-point version fields. Missing intervals and incompatible versions are not connected in the plot. Thirty requested days can have fewer available observations. Current and historical counts come from separate snapshots and may differ near the same timestamp.
+
+See the [dated methodology and data audit](docs/METHODOLOGY-AUDIT.md) for independent recalculation results and trust limits, and [API research and provenance](docs/API-SOURCES.md) for source implementation links and excluded sources.
 
 ## Project structure
 
@@ -56,8 +60,10 @@ See [API research and provenance](docs/API-SOURCES.md) for verified endpoints, s
 
 Production domain: https://zeclens.dev. The www hostname redirects to the apex; https://zeclens.vercel.app remains available as a hosting fallback. The repository includes a Vercel Web handler in `api/dashboard.ts`, which reuses the local server’s data validation. Successful public API responses have a 60-second Vercel CDN cache with a 120-second stale-while-revalidate window. In-process last-good data and request coalescing are best effort per function instance; a cold start can have no cached data. No analytics, wallet connection, account system, or secret is required.
 
-## Block timing
+## Observed block intervals
 
 The highlighted timing view groups observed block-header intervals by the self-reported client tag on each winning block. It uses the previous UTC-day window for every client and lets you switch between average, median and 90th-percentile intervals, with timed/returned sample counts. The network sample average stays visible for context. These observations depend on mining power, difficulty, chance and header timestamps. They are not controlled measurements of client processing or block-template generation speed.
+
+The limitation appears above the chart. Tag details describe each sample without ranking client speed. This dashboard cannot identify the fastest client; that requires a controlled benchmark dataset.
 
 `/api/block-timing` reads every matching indexed block through fixed ZecBlock cursor URLs, rechecks its first-page anchor, and discards incomplete or inconsistent captures. It has a 15-second total deadline, a five-minute per-instance cache and bounded CDN caching that expires by UTC midnight. Coverage can be partial if the upstream index is behind. The route creates no scheduled work. See [timing sources and methodology](docs/PERFORMANCE-SOURCES.md).

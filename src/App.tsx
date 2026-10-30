@@ -18,6 +18,7 @@ import ClientTable from "./components/ClientTable.tsx";
 import HistoryChart from "./components/HistoryChart.tsx";
 import Methodology from "./components/Methodology.tsx";
 import { useDashboardView } from "./lib/useDashboardView.ts";
+import { observationFreshness } from "./lib/freshness.ts";
 import {
   dashboardViewSearch,
   parseDashboardView,
@@ -39,8 +40,15 @@ function formatTime(value: string) {
 function App() {
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
-    const tick = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(tick);
+    const updateClock = () => setNow(Date.now());
+    const tick = setInterval(updateClock, 30_000);
+    window.addEventListener("focus", updateClock);
+    document.addEventListener("visibilitychange", updateClock);
+    return () => {
+      clearInterval(tick);
+      window.removeEventListener("focus", updateClock);
+      document.removeEventListener("visibilitychange", updateClock);
+    };
   }, []);
   const [dashboardView, updateView] = useDashboardView();
   const { period, view, client: filter, sort, order, metric } = dashboardView;
@@ -75,19 +83,27 @@ function App() {
   const focused = census?.clients.find((row) => row.name === filter);
   const history = payload?.history.data ?? [];
   const currentError = error ?? payload?.current.error;
-  const old = census
-    ? now - new Date(census.observedAt).valueOf() > 15 * 60_000
-    : false;
+  const censusFreshness = census
+    ? observationFreshness(census.observedAt, now)
+    : null;
+  const lastHistory = history.at(-1);
+  const historyFreshness = lastHistory
+    ? observationFreshness(lastHistory.at, now)
+    : null;
   const status = !census
     ? busy
       ? "Connecting to ZecBlock"
       : "Current census unavailable"
     : currentError
       ? "Showing last available observation"
-      : old
-        ? "Source observation is delayed"
-        : "Source connected · ZecBlock";
-  const stale = Boolean(currentError || old);
+      : censusFreshness?.clockSkew
+        ? "Census timestamp needs a clock check"
+        : censusFreshness?.delayed
+          ? "Census observation is delayed"
+          : "Census sample · ZecBlock";
+  const stale = Boolean(
+    currentError || censusFreshness?.delayed || censusFreshness?.clockSkew,
+  );
   const exportData = () => {
     if (!census) return;
     const blob = new Blob(
@@ -165,6 +181,10 @@ function App() {
             </button>
           </div>
         </div>
+        <p className="snapshot-note">
+          Manual snapshots · Use Refresh to check for updates. Source caches can
+          return the same observation.
+        </p>
         {sharing === "manual" && (
           <label className="share-fallback">
             Copy this view link
@@ -197,9 +217,12 @@ function App() {
             <p>
               {census ? (
                 <>
-                  Observed {formatTime(census.observedAt)} · Census v
-                  {census.censusVersion} · {census.coverage.toFixed(1)}%
-                  identified
+                  Observed{" "}
+                  <time dateTime={census.observedAt}>
+                    {formatTime(census.observedAt)}
+                  </time>{" "}
+                  · {censusFreshness?.ageLabel} · Census v{census.censusVersion}{" "}
+                  · {census.coverage.toFixed(1)}% identified
                 </>
               ) : (
                 "Counts will appear after a successful source request. No estimated or demo measurements."
@@ -208,6 +231,15 @@ function App() {
                 <span className="error-detail">{currentError}</span>
               )}
             </p>
+            {censusFreshness?.delayed && (
+              <p>Use Refresh to request a newer census sample.</p>
+            )}
+            {censusFreshness?.clockSkew && (
+              <p>
+                The source timestamp is ahead of this device’s clock. Check the
+                clock before judging freshness.
+              </p>
+            )}
           </div>
           <a
             href="https://zecblock.com/network/nodes"
@@ -257,7 +289,7 @@ function App() {
                   {census.identified.toLocaleString()} identified peers
                 </>
               ) : (
-                "Waiting for a verified observation"
+                "Waiting for a source observation"
               )}
             </p>
           </div>
@@ -375,6 +407,7 @@ function App() {
           busy={timing.busy}
           error={timing.error}
           metric={metric}
+          now={now}
           onMetricChange={(metric) => updateView({ metric })}
         />
         <div className="analytics-grid">
@@ -396,6 +429,27 @@ function App() {
                 ))}
               </div>
             </div>
+            {lastHistory && historyFreshness && (
+              <p className="data-timestamp">
+                Latest source record{" "}
+                <time dateTime={lastHistory.at}>
+                  {formatTime(lastHistory.at)}
+                </time>{" "}
+                · {historyFreshness.ageLabel}
+              </p>
+            )}
+            {historyFreshness?.delayed && (
+              <p role="status" className="inline-warning history-age-warning">
+                History’s latest source record is over 15 minutes old. Use
+                Refresh to check for newer records.
+              </p>
+            )}
+            {historyFreshness?.clockSkew && (
+              <p role="status" className="inline-warning history-age-warning">
+                History’s latest timestamp is ahead of this device’s clock.
+                Check the clock before judging freshness.
+              </p>
+            )}
             {(error || payload?.history.error) && (
               <p role="status" className="inline-warning">
                 {history.length
@@ -459,7 +513,7 @@ function App() {
         <div>
           <span>ZecLens</span>
           <span>
-            Independent view · Data by{" "}
+            Public observations · Data by{" "}
             <a
               href="https://zecblock.com/docs"
               target="_blank"

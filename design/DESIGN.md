@@ -41,6 +41,12 @@ Block timing uses a compact horizontal chart on a shared signed scale with zero 
 
 These additions use the existing request/refresh model and retain its explicit delayed, stale, unavailable and partial-coverage states. All exploration except changing the requested 7/30-day range stays local. No polling, persistence or dependency is added. The page renders one SVG history chart (at most 1,500 drawn points per client) and at most six timing bars. Original records remain available to the inspector and CSV; zoom reuses the same bounded drawing pipeline. Native buttons, range controls and disclosures support keyboard and touch, and the history plot retains native horizontal scrolling on mobile. Component styles stay next to their components.
 
+## Freshness and interpretation
+
+The page explicitly describes manual snapshots and possible cache reuse. The census banner applies only to the census. The current census, latest full-history record and timing source read each expose their own clock and age; history zoom does not change the freshness reference. An observation/read older than 15 minutes triggers a local warning. Timing separately warns when its sample date no longer matches the previous complete UTC day. A timestamp more than two minutes ahead prompts a device-clock check. Ages update every 30 seconds and when the tab becomes visible or focused, without network reads.
+
+The timing panel is titled **Observed block intervals** and states its performance limitation before the chart. It groups network-header observations by self-reported tags, with no client-speed ranking or above/below-average comparison copy. Methodology explains the single-provider sample, local-peer admission and separate snapshot clocks, and links a dated audit. These qualifications remain visible around interactive controls.
+
 ## Historical initial concept
 
 Visual target: `dashboard-concept.png`, a single desktop dashboard around 1440 × 1100. Design goal: let researchers understand the client mix among publicly reachable Zcash nodes, inspect provenance, and explore snapshots without implying a census of the whole network.

@@ -1,10 +1,14 @@
 import { ArrowUpRight } from "lucide-react";
 import { useId, useState } from "react";
 import type { DashboardView } from "../lib/dashboardView.ts";
-import type { BlockTiming as Timing } from "../lib/blockTiming.ts";
+import {
+  previousCompleteUtcDay,
+  type BlockTiming as Timing,
+} from "../lib/blockTiming.ts";
 import type { Resource } from "../lib/census.ts";
 import { clientColor } from "../lib/colors.ts";
 import { intervalBarLayout } from "../lib/timingChart.ts";
+import { observationFreshness } from "../lib/freshness.ts";
 import "./BlockTiming.css";
 
 const seconds = new Intl.NumberFormat(undefined, {
@@ -38,7 +42,16 @@ const metricKeys = ["mean", "median", "p90"] as const;
 function duration(value: number | null) {
   return value === null ? "—" : `${seconds.format(value)} s`;
 }
+function isUtcDay(value: string) {
+  const time = Date.parse(`${value}T00:00:00Z`);
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    Number.isFinite(time) &&
+    new Date(time).toISOString().slice(0, 10) === value
+  );
+}
 function dayLabel(value: string) {
+  if (!isUtcDay(value)) return "Unknown day";
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",
@@ -46,22 +59,47 @@ function dayLabel(value: string) {
     timeZone: "UTC",
   }).format(new Date(`${value}T00:00:00Z`));
 }
+function readTimeLabel(value: string) {
+  const date = new Date(value);
+  if (!Number.isFinite(date.valueOf())) return "Unknown read time";
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(date);
+}
 export default function BlockTiming({
   resource,
   busy,
   error,
   metric,
   onMetricChange,
+  now,
 }: {
   resource: Resource<Timing> | null;
   busy: boolean;
   error: string | null;
   metric: DashboardView["metric"];
   onMetricChange: (metric: DashboardView["metric"]) => void;
+  now: number;
 }) {
   const selectedMetric = intervalMetrics[metric];
   const comparisonId = useId();
   const data = resource?.data ?? null;
+  const freshness = data ? observationFreshness(data.fetchedAt, now) : null;
+  const expectedDay = previousCompleteUtcDay(now);
+  const dayWarning =
+    data && data.day !== expectedDay
+      ? !isUtcDay(data.day)
+        ? `The sample's UTC date is invalid. Use Refresh to request ${dayLabel(expectedDay)} UTC.`
+        : data.day < expectedDay
+          ? `Older daily sample. Use Refresh to request the latest complete UTC day: ${dayLabel(expectedDay)} UTC.`
+          : `The sample date is later than the latest complete UTC day (${dayLabel(expectedDay)} UTC). Check your device clock and use Refresh.`
+      : null;
   const [selection, setSelection] = useState<{
     day: string;
     key: string;
@@ -89,16 +127,14 @@ export default function BlockTiming({
       setSelection(selected?.key === key ? null : { day: data.day, key });
   };
   const chart = intervalBarLayout(rows.map((row) => row[selectedMetric.field]));
-  const averageDifference =
-    selected?.meanSeconds != null && data?.meanSeconds != null
-      ? selected.meanSeconds - data.meanSeconds
-      : null;
   return (
     <section className="block-timing" aria-labelledby="block-timing-title">
       <div className="section-heading">
         <div>
-          <h2 id="block-timing-title">Block timing</h2>
-          <p className="section-subtitle">Observed intervals by client tag</p>
+          <h2 id="block-timing-title">Observed block intervals</h2>
+          <p className="section-subtitle">
+            Grouped by self-reported client tags
+          </p>
         </div>
         <a
           className="timing-source"
@@ -109,6 +145,10 @@ export default function BlockTiming({
           Source <ArrowUpRight size={14} />
         </a>
       </div>
+      <p className="timing-context">
+        <strong>Client performance is not measured here.</strong> These are
+        times between network blocks, grouped by the tag on the ending block.
+      </p>
       {issue && (
         <p className="inline-warning" role="status">
           {data
@@ -117,6 +157,22 @@ export default function BlockTiming({
           {issue}
         </p>
       )}
+      {dayWarning && (
+        <p className="inline-warning timing-day-warning" role="status">
+          {dayWarning}
+        </p>
+      )}
+      {freshness?.clockSkew ? (
+        <p className="inline-warning timing-read-warning" role="status">
+          The sample read time is ahead of this device’s clock. Check the clock
+          and use Refresh.
+        </p>
+      ) : freshness?.delayed ? (
+        <p className="inline-warning timing-read-warning" role="status">
+          This daily sample was last read over 15 minutes ago. Use Refresh to
+          check the source again.
+        </p>
+      ) : null}
       <div className="timing-layout">
         <div className="timing-overview">
           <span className="eyebrow">SAMPLE AVERAGE</span>
@@ -139,14 +195,23 @@ export default function BlockTiming({
             ) : busy ? (
               "Reading the previous UTC day…"
             ) : (
-              "No verified timing sample"
+              "No timing sample available"
             )}
           </p>
+          {data && freshness && (
+            <p className="timing-capture">
+              Sample read{" "}
+              <time dateTime={data.fetchedAt}>
+                {readTimeLabel(data.fetchedAt)}
+              </time>{" "}
+              · {freshness.ageLabel}
+            </p>
+          )}
           <p>From one network block to the next.</p>
         </div>
         <div className="timing-comparison">
           <div className="timing-controls">
-            <span id={`${comparisonId}-label`}>Client statistic</span>
+            <span id={`${comparisonId}-label`}>Interval statistic</span>
             <div
               className="segmented small"
               role="group"
@@ -277,20 +342,12 @@ export default function BlockTiming({
                   </p>
                 ) : selected.timedBlocks === 0 ? (
                   <p>Intervals are unavailable for these blocks.</p>
-                ) : averageDifference !== null &&
-                  Number.isFinite(averageDifference) ? (
-                  <p>
-                    {averageDifference === 0
-                      ? "Its average matches the overall sample average."
-                      : `Its average is ${duration(Math.abs(averageDifference))} ${averageDifference > 0 ? "above" : "below"} the overall sample average.`}{" "}
-                    These observations do not measure client processing speed.
-                  </p>
                 ) : null}
               </>
             )}
           </div>
           <details className="timing-table-details">
-            <summary>View all client timings as a table</summary>
+            <summary>View interval statistics as a table</summary>
             <div className="timing-client-table table-wrap">
               <table
                 id={`${comparisonId}-table`}
@@ -370,7 +427,7 @@ export default function BlockTiming({
         <p>
           Each interval is a block’s timestamp minus its previous network
           block’s timestamp. We group it by the tag on the block that ends the
-          interval, using the same previous UTC-day window for every client.
+          interval, using the same displayed UTC-day window for every tag.
           Averages include every available interval, including repeated or
           backward timestamps. Missing intervals stay unavailable.
         </p>
@@ -393,8 +450,7 @@ export default function BlockTiming({
             </p>
             <p>
               Median: half the timed blocks are at or below this interval. 90th
-              percentile: nine out of ten do. Read from the source at{" "}
-              {new Date(data.fetchedAt).toLocaleString()}.{" "}
+              percentile: nine out of ten do.{" "}
               <a href={data.source} target="_blank" rel="noreferrer">
                 View block sample <ArrowUpRight size={12} />
               </a>

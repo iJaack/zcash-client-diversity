@@ -265,6 +265,18 @@ h1 {
   min-height: 81px;
   background: #101e15;
 }
+.snapshot-note,
+.data-timestamp {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.snapshot-note {
+  margin: -8px 0 18px;
+}
+.data-timestamp {
+  margin: 0 0 12px;
+}
 .source-banner strong {
   font-size: 15px;
   font-weight: 650;
